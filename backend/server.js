@@ -202,15 +202,6 @@ app.post("/api/generate-image", async (req, res) => {
   }
 });
 
-app.get("/api/images", (req, res) => {
-  const images = getImageStore();
-  // console.log("imageStore:\n", images);
-  res.status(200).json(images);
-});
-
-
-
-
 
 let clients = []; // Track connected SSE clients
 
@@ -254,12 +245,6 @@ app.post("/api/images/generate", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-});
-
-// Endpoint to get all images
-app.get("/api/images", (req, res) => {
-  const images = getImageStore();
-  res.status(200).json(images);
 });
 
 
