@@ -1,0 +1,269 @@
+
+import express from "express";
+import cors from "cors";
+import { OpenAI } from "openai";
+import prompts from "./prompts.json" with { type: "json" };
+import { generateImage, generateImageDalle, getImageStore, imageEventEmitter } from "./imageCreator.js";
+import dotenv from "dotenv";
+dotenv.config(); // Load environment variables
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const systemPrompt01 = prompts.systemPrompt01;
+const userPrompt01 = prompts.userPrompt01;
+let sessionMessages = {}; // Store messages keyed by session ID or user ID
+if(!sessionMessages[999]) sessionMessages[999] = 0;
+let imgID;
+
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Allow requests from React app
+  })
+);
+
+// Log all incoming requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
+app.post("/api/button-click", async (req, res) => {
+  const { content } = req.body; // Extract the content from the request body
+
+  if (!content) {
+    return res.status(400).json({ error: "Content is required" });
+  }
+
+  console.log("Button clicked with content:", content);
+
+  // Call generateContent with the button content as the prompt
+  try {
+    const buttonPrompt = "The user clicked the button that says: \"" + content + "\". Generate a new UI based on this button click.";
+    
+    await generateContent(content, res);
+    // Send a response back to the button click
+  } catch (error) {
+    console.error("Error generating content for button click:", error.message);
+    res.status(500).json({ error: "Failed to generate content for button click" });
+  }
+});
+
+const generateContent = async (prompt, res) => {
+  if(!sessionMessages[9999]) {
+    sessionMessages[9999] = 1;
+  } else {
+    sessionMessages[9999]++;
+  };
+  const sessionId = sessionMessages[9999];
+
+  if (!prompt) {
+    return res.status(400).json({ error: "Prompt is required" });
+  }
+
+  try {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    console.log("New request: ", prompt);
+
+    const sessionIds = [sessionId - 2, sessionId - 1, sessionId]; // Include multiple sessions
+    const contextWindow = sessionIds
+      .map(id => sessionMessages[id] || "") // Map to message content
+      .join(""); // Concatenate all messages
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt01 },
+        { role: "user", content: userPrompt01 + prompt},
+        { role: "assistant", content: contextWindow }, // Add full previous response
+      ],
+      // temperature: 0.7, // Controls randomness in the output
+      // top_p: 0.9, // Controls diversity via nucleus sampling
+      // max_tokens: 500,
+      // presence_penalty: 0.6, // -2 to +2, Increases the likelihood of exploring new topics
+      // frequency_penalty: -1, // -2 to +2, Decreases the likelihood of repeating phrases
+      stream: true,
+    });
+
+    let buffer = ""; // Accumulate fragments of JSON
+    let fullMessage = "";
+
+    for await (const chunk of response) {
+      const content = chunk.choices[0]?.delta?.content;
+
+      if (content) {
+        buffer += content; // Accumulate chunk
+        fullMessage += content;
+
+        try {
+          let tempBuffer = buffer;
+
+          // Remove leading `[` and trailing `]` or `,` if present
+          if (tempBuffer.startsWith('[')) {
+            tempBuffer = tempBuffer.slice(1); // Remove the first character
+          }
+          if (tempBuffer.endsWith(']')) {
+            tempBuffer = tempBuffer.slice(0, -1); // Remove the last character
+          }
+          if (tempBuffer.endsWith(',')) {
+            tempBuffer = tempBuffer.slice(0, -1); // Remove the last comma
+          } else if (tempBuffer.charAt(tempBuffer.length - 2) === ',') {
+            tempBuffer = tempBuffer.slice(0, -2) + tempBuffer.slice(-1); // Remove the second-to-last comma
+          } else if (tempBuffer.charAt(tempBuffer.length - 3) === ',') {
+            tempBuffer = tempBuffer.slice(0, -3) + tempBuffer.slice(-2); // Remove the third-to-last comma
+          }
+
+          tempBuffer = `[${tempBuffer}]`; // Re-wrap in array format
+          
+          // Try parsing the accumulated buffer to detect valid JSON
+          try {
+            const tempParsedData = JSON.parse(tempBuffer);
+          
+            if (Array.isArray(tempParsedData)) {
+              // Send each new component individually
+              tempParsedData.forEach((item, index) => {
+               
+                if(item.type === "image" || item.type === "list-item") {
+                  if (typeof imgID === "undefined" || imgID === null) {
+                    imgID = 1;
+                  } else {
+                    imgID++;
+                  }
+                  
+                  item.props.imageSrc = "";
+                  item.props.imageID = imgID;
+                  
+                  // Request image from imageCreator here
+                  // Generate the image and update the item's props
+                  try {
+                    const imageUrl = generateImage(imgID, item.props.columns, item.props.content || "a broken image");
+                  } catch (error) {
+                    console.error("Error generating image:", error.message);
+                    item.props.imageSrc = "/img/default-image.png"; // Fallback image
+                  }
+                }
+                console.log("Sending component:\n", item);
+                res.write(`data: ${JSON.stringify(item)}\n\n`);
+              });
+
+              buffer = ""; // Clear buffer after sending all components
+            }
+          } catch (error) {
+            // console.error("Error parsing tempBuffer:", error.message);
+          }
+        } catch (err) {
+          // If parsing fails, it means the data is incomplete, continue accumulating
+          continue;
+        }
+      }
+    }
+    res.write("data: [DONE]\n\n"); // Signal completion
+    res.end();
+
+    // Save full message to session store
+    sessionMessages[sessionId+1] = "\nUser prompt: " + prompt + "\nAssistant response:\n" + fullMessage;
+
+  } catch (error) {
+    console.error("Streaming Error:", error.response?.data || error.message);
+    res.status(500).json({ error: "Failed to generate content." });
+  }
+// });
+};
+
+app.get("/api/generate", async (req, res) => {
+  const prompt = req.query.prompt;
+  if (!prompt) {
+    return res.status(400).send("Prompt is required");
+  }
+  await generateContent(prompt, res);
+});
+
+app.post("/api/generate-image", async (req, res) => {
+  const { prompt } = req.body;
+
+  if (!prompt) {
+    return res.status(400).json({ error: "Prompt is required" });
+  }
+
+  try {
+    const imageUrl = await generateImage(prompt);
+    res.status(200).json({ imageUrl, message: "Image generated successfully!" });
+  } catch (error) {
+    console.error("Error generating image:", error.message);
+    res.status(500).json({ error: "Failed to generate image" });
+  }
+});
+
+app.get("/api/images", (req, res) => {
+  const images = getImageStore();
+  // console.log("imageStore:\n", images);
+  res.status(200).json(images);
+});
+
+
+
+
+
+let clients = []; // Track connected SSE clients
+
+// SSE endpoint to notify about new images
+app.get("/api/images/stream", (req, res) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  // Add client to the list
+  clients.push(res);
+
+  // Remove client on disconnect
+  req.on("close", () => {
+    // console.log("SSE client disconnected");
+    clients = clients.filter((client) => client !== res);
+  });
+});
+
+// Listen for new images and notify clients
+imageEventEmitter.on("newImage", (imageUrl, imgEventID) => {
+  console.log("New image, notifying clients. imgID:", imgID, " imgEventID: ", imgEventID);
+
+  // Notify all connected clients
+  clients.forEach((client) => {
+    client.write(`data: ${JSON.stringify({ imageUrl, imgEventID })}\n\n`);
+  });
+});
+
+// Endpoint to generate an image
+app.post("/api/images/generate", async (req, res) => {
+  const { prompt } = req.body;
+
+  if (!prompt) {
+    return res.status(400).json({ error: "Prompt is required" });
+  }
+
+  try {
+    const imageUrl = await generateImage(prompt);
+    res.status(200).json({ imageUrl });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Endpoint to get all images
+app.get("/api/images", (req, res) => {
+  const images = getImageStore();
+  res.status(200).json(images);
+});
+
+
+const PORT = 4000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});

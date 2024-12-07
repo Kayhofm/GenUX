@@ -1,0 +1,102 @@
+
+.main-page {
+  background-color: #FAFAFA;
+  width: 460px;
+  border: 1px solid red;
+  display: flex; /* Flexbox for layout */
+  flex-wrap: wrap;
+  gap: 20px; /* Adds spacing between items */
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 200px;
+}
+
+.button {  
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .button:hover {
+    background-color: #0056b3;
+  }
+  
+  .text {
+    text-align: left;  
+    display: block;
+    color: rgb(0, 0, 0);
+    padding-top: 10px;
+    /* border: 1px solid red; */
+    font-size: 16px;
+  }
+
+  .listItem {
+    text-align: left;  
+    display: block;
+    color: rgb(0, 0, 0);
+    padding-top: 10px;
+    /* border: 1px solid red; */
+    font-size: 16px;
+  }
+
+  .image {
+    /* display: block;
+    background-color: #aaaaaa;
+    color: white;
+    padding: 10px 20px; */
+    width: 100%;
+    height: auto;
+    border: none;
+    border-radius: 5px;
+  }
+
+  .icon {
+    vertical-align: top;
+    width: "20px";
+    height: "20px";
+    margin-right: "8px";
+  }
+
+  .list-item {
+    display: flex; /* Enable horizontal layout */
+    align-items: flex-start; /* Align children to the top */
+    gap: 8px; /* Add space between image and text */
+  }
+  
+  .icon-container {
+    width: 20px; /* Set fixed dimensions for the icon */
+    height: 20px;
+    background-size: contain; /* Ensure the image fits inside the container */
+    background-repeat: no-repeat; /* Prevent repeating */
+    margin-right: 8px; /* Space between icon and text */
+  }
+  
+  .text-container {
+    flex: 1; /* Allow text to take up remaining space */
+    text-align: left; /* Align text to the left */
+  }
+
+  .header {
+    text-align: left;  
+    color: black;
+    padding-top: 10px;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+  .input {
+    background-color: #cccccc;
+    color: black;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }

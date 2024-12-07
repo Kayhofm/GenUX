@@ -1,0 +1,11 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@fal-ai/client": "^1.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "esm": "^3.2.25",
+    "express": "^4.21.1",
+    "openai": "^4.72.0"
+  }
+}

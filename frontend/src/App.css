@@ -1,0 +1,176 @@
+.App {
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.App-header {
+  background-color: #282c34;
+  color: white;
+  padding: 20px;
+  border: 10px solid #ffffff;
+}
+
+.App-main {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px;
+}
+
+.control-panel {
+  flex: 1;
+  padding: 20px;
+}
+
+.UI-section, .Control-panel-section {
+  width: 45%;
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.main-page {
+  background-color: #FAFAFA;
+  width: 460px;
+  border: 1px solid red;
+  display: flex; /* Flexbox for layout */
+  flex-wrap: wrap;
+  gap: 20px; /* Adds spacing between items */
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 200px;
+}
+
+.header {
+  text-align: left;  
+  color: black;
+  padding-top: 10px;
+  border: none;
+  font-size: 24px;
+  font-weight: bold;
+  /* border: 1px solid red; */
+}
+
+.text {
+  text-align: left;  
+  display: block;
+  color: rgb(0, 0, 0);
+  padding-top: 10px;
+  /* border: 1px solid red; */
+  font-size: 16px;
+}
+
+.list-item {
+  text-align: left;  
+  display: block;
+  color: rgb(0, 0, 0);
+  padding-top: 10px;
+  /* border: 1px solid red; */
+  font-size: 16px;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  border: none;
+  border-radius: 5px;
+}
+
+.icon {
+  vertical-align: top;
+  width: "20px";
+  height: "20px";
+  margin-right: "8px";
+}
+
+.list-item {
+  display: flex; /* Enable horizontal layout */
+  align-items: flex-start; /* Align children to the top */
+  gap: 8px; /* Add space between image and text */
+}
+
+.icon-container {
+  width: 20px; /* Set fixed dimensions for the icon */
+  height: 20px;
+  background-size: contain; /* Ensure the image fits inside the container */
+  background-repeat: no-repeat; /* Prevent repeating */
+  margin-right: 8px; /* Space between icon and text */
+}
+
+.text-container {
+  flex: 1; /* Allow text to take up remaining space */
+  text-align: left; /* Align text to the left */
+}
+
+.button {  
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.error {
+  color: red;
+}
+
+.input {
+  background-color: #cccccc;
+  color: black;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Fade-in animation */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Typewriter animation */
+.typewriter {
+  overflow: hidden; /* Ensures the text is hidden until revealed */
+  white-space: nowrap; /* Prevents text wrapping */
+  /* border-right: 2px solid; /* Adds the blinking cursor effect */
+  display: inline-block; /* Ensures the width animation works properly */
+  width: 460px; /* Limits the container width */
+  box-sizing: border-box; /* Includes padding and border in width calculation */
+  animation: typing 3s steps(30, end), blink 0.3s step-end infinite;
+}
+
+@keyframes typing {
+  from {
+    width: 0; /* Start with no text visible */
+  }
+  to {
+    width: 460px; /* Reveal text within the limited width */
+  }
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent; /* Cursor blinks by toggling transparency */
+  }
+}
