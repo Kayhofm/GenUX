@@ -101,14 +101,14 @@ function DynamicRenderer({ component, onContentGenerated }) {
   switch (type) {
     case "header":
       return <header
-      className={`${props.styleClass} fade-in`}
+      className={`${type} fade-in`}
       style={{ width: `${width}px` }}
         >
           {props.content}
         </header>;
     case "text":
       return <div 
-      className={`${props.styleClass} fade-in`}
+      className={`${type} fade-in`}
       style={{ width: `${width}px` }}
         >
           {props.content}
@@ -116,7 +116,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
     case "button":
       return (
         <button
-        className={`${props.styleClass} fade-in`}
+        className={`${type} fade-in`}
           style={{ width: `${width}px` }}
           onClick={handleClick}
           disabled={loading}
@@ -135,13 +135,13 @@ function DynamicRenderer({ component, onContentGenerated }) {
     case "input":
       return <input
         type="text"
-        className={`${props.styleClass} fade-in`}
-        style={{ width: `${width}px` }}
+        className={`${type} fade-in`}
+        style={{ width: `${width-40}px` }}
         placeholder={props.content || "Input"}
       />
     case "list-item":
       return <list-item
-      className={`${props.styleClass} fade-in`}
+      className={`${type} fade-in`}
       style={{ width: `${width}px`, display: "flex" }}
       >
         <div className="icon-container">
@@ -152,7 +152,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
           />
         </div>
         <div className="text-container">
-        <span className="typewriter">{props.content || "Default header"}</span>
+        <span>{props.content || "Default header"}</span>
         </div>
       </list-item>
     default:

@@ -62,15 +62,6 @@
   font-size: 16px;
 }
 
-.list-item {
-  text-align: left;  
-  display: block;
-  color: rgb(0, 0, 0);
-  padding-top: 10px;
-  /* border: 1px solid red; */
-  font-size: 16px;
-}
-
 .image {
   width: 100%;
   height: auto;
@@ -86,15 +77,16 @@
 }
 
 .list-item {
-  display: flex; /* Enable horizontal layout */
-  align-items: flex-start; /* Align children to the top */
-  gap: 8px; /* Add space between image and text */
+  display: flex; /* Horizontal layout */
+  align-items: flex-start; /* Align to the top */
+  width: 100%; /* Full width */
+  gap: 8px; /* Space between children */
 }
 
 .icon-container {
-  width: 20px; /* Set fixed dimensions for the icon */
+  width: 20px; /* Fixed icon size */
   height: 20px;
-  background-size: contain; /* Ensure the image fits inside the container */
+  background-size: contain; /* Ensure the image fits inside */
   background-repeat: no-repeat; /* Prevent repeating */
   margin-right: 8px; /* Space between icon and text */
 }
@@ -102,6 +94,10 @@
 .text-container {
   flex: 1; /* Allow text to take up remaining space */
   text-align: left; /* Align text to the left */
+  max-width: calc(100% - 28px); /* Ensure it accounts for the icon and gap */
+  white-space: normal; /* Enable wrapping */
+  word-break: break-word; /* Break long words */
+  overflow-wrap: break-word; /* Compatibility for older browsers */
 }
 
 .button {  
@@ -152,10 +148,10 @@ button:disabled {
 /* Typewriter animation */
 .typewriter {
   overflow: hidden; /* Ensures the text is hidden until revealed */
-  white-space: nowrap; /* Prevents text wrapping */
+  /* white-space: nowrap; /* Prevents text wrapping */
   /* border-right: 2px solid; /* Adds the blinking cursor effect */
   display: inline-block; /* Ensures the width animation works properly */
-  width: 460px; /* Limits the container width */
+  width: 100%; /* Limits the container width */
   box-sizing: border-box; /* Includes padding and border in width calculation */
   animation: typing 3s steps(30, end), blink 0.3s step-end infinite;
 }
