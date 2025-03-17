@@ -7,25 +7,26 @@ import { generateImage, generateImageDalle, getImageStore, imageEventEmitter } f
 import dotenv from "dotenv";
 dotenv.config(); // Load environment variables
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const systemPrompt01 = prompts.systemPrompt01;
-const userPrompt01 = prompts.userPrompt01;
-let sessionMessages = {}; // Store messages keyed by session ID or user ID
-if(!sessionMessages[999]) sessionMessages[999] = 0;
-let imgID;
-
+const app = express();
+app.use(cors());
+app.use(express.json());
 app.use(
   cors({
     origin: "http://localhost:3000", // Allow requests from React app
   })
 );
+
+import fs from 'fs';
+const systemPrompt01 = fs.readFileSync('systemPrompt.txt', 'utf8');
+// const systemPrompt01 = prompts.systemPrompt01;
+const userPrompt01 = prompts.userPrompt01;
+let sessionMessages = {}; // Store messages keyed by session ID or user ID
+if(!sessionMessages[999]) sessionMessages[999] = 0;
+let imgID;
 
 // Log all incoming requests
 app.use((req, res, next) => {
