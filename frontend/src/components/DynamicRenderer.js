@@ -1,20 +1,10 @@
 import React, { useState } from "react";
+import { Typography, Button, Box, TextField, Avatar, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
 
 function DynamicRenderer({ component, onContentGenerated }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // State to store the fetched image URLs
-  // const [images, setImages] = useState([]);
-  // const [imageUrl, setImageUrl] = useState(null);
-
-  // State to store the streamed components
-  // const [activeComponent, setActiveComponent] = useState(component);
-
-  // const comp = activeComponent.component || activeComponent; // Use active component
-  // console.log("imageID: ", comp.props.imageID)
-
-  
   const handleClick = () => {
     if (component.type === "button") {
       setLoading(true);
@@ -82,10 +72,9 @@ function DynamicRenderer({ component, onContentGenerated }) {
         });
     }
   };
-  
 
   if (!component || !component.type || !component.props) {
-    return <p>Invalid component structure.</p>;
+    return <Typography variant="body1">Invalid component structure.</Typography>;
   }
 
   const { type, props } = component;
@@ -93,70 +82,70 @@ function DynamicRenderer({ component, onContentGenerated }) {
   const widths = {
     "2": 140,
     "3": 220,
+    "4": 300,
     "6": 460,
   };
   const width = widths[props.columns] || 220; // Default to 220 if no match
 
-
   switch (type) {
     case "header":
-      return <header
-      className={`${type} fade-in`}
-      style={{ width: `${width}px` }}
-        >
-          {props.content}
-        </header>;
+      return <Typography
+        variant="h5"
+        className={`${type} fade-in`}
+        style={{ width: `${width}px` }}
+      >
+        {props.content}
+      </Typography>;
     case "text":
-      return <div 
-      className={`${type} fade-in`}
-      style={{ width: `${width}px` }}
-        >
-          {props.content}
-        </div>;
+      return <Box
+        className={`${type} fade-in`}
+        style={{ width: `${width}px` }}
+      >
+        {props.content}
+      </Box>;
     case "button":
       return (
-        <button
-        className={`${type} fade-in`}
+        <Button
+          variant="contained"
+          className={`${type} fade-in`}
           style={{ width: `${width}px` }}
           onClick={handleClick}
           disabled={loading}
         >
           {loading ? "Loading..." : props.content}
-        </button>
+        </Button>
       );
     case "image":
-      // console.log("ImageID: ", props.imageID, "URL: ", props.imageSrc)
-      return <img 
-        src={props.imageSrc || "/img/default-image.png"} 
-        alt={props.content} 
+      return <Avatar
+        src={props.imageSrc || "/img/default-image.png"}
+        alt={props.content}
         className={`${type} fade-in`}
-        style={{ width: `${width}px` }}
+        style={{ width: `${width}px`, height: `${width}px` }}
       />;
     case "input":
-      return <input
+      return <TextField
         type="text"
         className={`${type} fade-in`}
         style={{ width: `${width-40}px` }}
         placeholder={props.content || "Input"}
-      />
+        variant="outlined"
+      />;
     case "list-item":
-      return <list-item
-      className={`${type} fade-in`}
-      style={{ width: `${width}px`, display: "flex" }}
+      return <ListItem
+        className={`${type} fade-in`}
+        style={{ width: `${width}px`, display: "flex" }}
       >
-        <div className="icon-container">
-          <img
+        <ListItemAvatar>
+          <Avatar
             src={props.imageSrc || "/img/default-image.png"}
-            alt={""} 
-            style={{ width: `20px` }}
+            alt={""}
+            style={{ width: `40px` }}
           />
-        </div>
-        <div className="text-container">
-        <span>{props.content || "Default header"}</span>
-        </div>
-      </list-item>
+        </ListItemAvatar>
+        <ListItemText primary={props.content || "Default header"} />
+      </ListItem>;
     default:
-      return <p>Unsupported component type: {type}</p>;
+      return <Typography variant="body1">Unsupported component type: {type}</Typography>;
   }
 }
 

@@ -84,15 +84,19 @@
 }
 
 .icon-container {
-  width: 20px; /* Fixed icon size */
-  height: 20px;
+  width: 40px; /* Fixed icon size */
+  height: 40px;
+  border-radius: 5px;
   background-size: contain; /* Ensure the image fits inside */
   background-repeat: no-repeat; /* Prevent repeating */
-  margin-right: 8px; /* Space between icon and text */
+  margin-right: 16px; /* Space between icon and text */
 }
 
 .text-container {
+  display: flex;
   flex: 1; /* Allow text to take up remaining space */
+  align-items: center; /* Vertical centering */
+  height: 100%; /* or a specific height, e.g., 50px or 100vh */
   text-align: left; /* Align text to the left */
   max-width: calc(100% - 28px); /* Ensure it accounts for the icon and gap */
   white-space: normal; /* Enable wrapping */

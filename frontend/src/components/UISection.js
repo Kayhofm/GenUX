@@ -9,13 +9,16 @@ function UISection({ content, onContentGenerated }) {
     const eventSource = new EventSource("http://localhost:4000/api/images/stream");
 
     eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-
-      if (data.imgEventID && data.imageUrl) {
-        setImageMap((prevMap) => ({
-          ...prevMap,
-          [data.imgEventID]: data.imageUrl,
-        }));
+      try {
+        const data = JSON.parse(event.data);
+        if (data.imgEventID && data.imageUrl) {
+          setImageMap((prevMap) => ({
+            ...prevMap,
+            [data.imgEventID]: data.imageUrl,
+          }));
+        }
+      } catch (err) {
+        console.error("Error parsing SSE data:", event.data, err);
       }
     };
 
