@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Typography, Button, Box, TextField, Avatar, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
+import { Typography, Button, Fab, Box, TextField, Avatar, ListItem, ListItemAvatar, ListItemText, IconButton, CardMedia, Slider } from '@mui/material';
+import * as Icons from '@mui/icons-material';
 
 function DynamicRenderer({ component, onContentGenerated }) {
   const [loading, setLoading] = useState(false);
@@ -92,15 +93,15 @@ function DynamicRenderer({ component, onContentGenerated }) {
       return <Typography
         variant="h5"
         className={`${type} fade-in`}
-        style={{ width: `${width}px` }}
+        sx={{ width: `${width}px`, margin: '10px 10px' }}
       >
         {props.content}
       </Typography>;
     case "text":
       return <Box
         className={`${type} fade-in`}
-        style={{ width: `${width}px` }}
-      >
+        sx={{ width: `${width}px`, margin: '10px 10px' }}
+        >
         {props.content}
       </Box>;
     case "button":
@@ -108,25 +109,63 @@ function DynamicRenderer({ component, onContentGenerated }) {
         <Button
           variant="contained"
           className={`${type} fade-in`}
-          style={{ width: `${width}px` }}
+          sx={{ width: `${width}px`, margin: '10px 10px' }}
           onClick={handleClick}
           disabled={loading}
         >
           {loading ? "Loading..." : props.content}
         </Button>
       );
-    case "image":
+    case "iconButton":
+      {
+        const iconName = props.content.charAt(0).toUpperCase() + props.content.slice(1);
+        const IconComponent = Icons[iconName];
+        return (
+          <Fab
+            color="primary"
+            className={`${type} fade-in`}
+            onClick={handleClick}
+            disabled={loading}
+            sx={{ margin: '10px 12px' }}
+          >
+            {loading ? "Loading..." : (IconComponent ? <IconComponent /> : <Typography>{props.content}</Typography>)}
+          </Fab>
+        );
+      }
+    case "icon":
+      const iconName = props.content.charAt(0).toUpperCase() + props.content.slice(1);
+      const IconComponent = Icons[iconName];
+      return (
+        <IconButton
+          color="primary" // set the icon color ("secondary" if needed)
+          className={`${type} fade-in`}
+          onClick={handleClick}
+          disabled={loading}
+          sx={{ margin: '10px 20px' }}
+        >
+          {loading ? "Loading..." : IconComponent ? <IconComponent /> : <Typography>{props.content}</Typography>}
+        </IconButton>
+      );
+    case "avatar":
       return <Avatar
         src={props.imageSrc || "/img/default-image.png"}
         alt={props.content}
         className={`${type} fade-in`}
-        style={{ width: `${width}px`, height: `${width}px` }}
+        style={{ width: `${width}px`, height: `${width}px`, margin: '10px 10px' }}
       />;
-    case "input":
+    case "image":
+      return <Box
+        component="img"
+        src={props.imageSrc || "/img/default-image.png"}
+        alt={props.content}
+        className={`${type} fade-in`}
+        sx={{ width: `${width}px`, height: `${width}px`, margin: '10px 10px' }}
+      />;
+    case "textInput":
       return <TextField
         type="text"
         className={`${type} fade-in`}
-        style={{ width: `${width-40}px` }}
+        sx={{ width: `${width}px`, margin: '10px 10px' }}
         placeholder={props.content || "Input"}
         variant="outlined"
       />;
@@ -144,6 +183,21 @@ function DynamicRenderer({ component, onContentGenerated }) {
         </ListItemAvatar>
         <ListItemText primary={props.content || "Default header"} />
       </ListItem>;
+    case "slider":
+      return <Slider
+        sx={{ width: `${width}px`, margin: '10px 10px' }}
+        defaultValue={props.content || 50}
+        min={props.min || 0}
+        max={props.max || 100}
+        onChangeCommitted={(e, value) => props.onChange && props.onChange(value)}
+      />;
+    case "space":
+      return <Box
+        className={`${type} fade-in`}
+        sx={{ width: `${width}px`, margin: '10px 10px' }}
+        >
+        {"\u00A0"}
+      </Box>;
     default:
       return <Typography variant="body1">Unsupported component type: {type}</Typography>;
   }

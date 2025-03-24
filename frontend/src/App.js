@@ -1,6 +1,6 @@
-
 import React, { useState, useCallback } from "react";
 import './App.css';
+// import "./styles/debug.css";
 
 const ControlPanel = React.lazy(() => import('./components/ControlPanel'));
 const UISection = React.lazy(() => import('./components/UISection'));

@@ -1,9 +1,11 @@
-
 import React, { useEffect, useState } from "react";
 import DynamicRenderer from "./DynamicRenderer";
+import { Box } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
-function UISection({ content, onContentGenerated }) {
+function UISection({ content, onContentGenerated, ...props }) {
   const [imageMap, setImageMap] = useState({}); // Store matched image URLs
+  const theme = useTheme();
 
   useEffect(() => {
     const eventSource = new EventSource("http://localhost:4000/api/images/stream");
@@ -33,7 +35,16 @@ function UISection({ content, onContentGenerated }) {
   }, []);
 
   return (
-    <div className="main-page">
+    <Box
+      {...props}
+      style={{
+        display: "flex", // added flex display to render components side by side
+        flexWrap: "wrap", // allow wrapping if needed
+        backgroundColor: theme.palette.background.default,
+        width: "480px", // added fixed width
+        ...props.style
+      }}
+    >
       {content.map((component, index) => (
         <DynamicRenderer
           key={index}
@@ -47,7 +58,7 @@ function UISection({ content, onContentGenerated }) {
           onContentGenerated={onContentGenerated}
         />
       ))}
-    </div>
+    </Box>
   );
 }
 
