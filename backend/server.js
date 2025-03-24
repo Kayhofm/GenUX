@@ -81,6 +81,7 @@ const generateContent = async (prompt, res) => {
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
+      // model: "o3-mini",
       messages: [
         { role: "system", content: systemPrompt01 },
         { role: "user", content: userPrompt01 + prompt},

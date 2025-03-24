@@ -166,7 +166,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
         type="text"
         className={`${type} fade-in`}
         sx={{ width: `${width}px`, margin: '10px 10px' }}
-        placeholder={props.content || "Input"}
+        placeholder={props.content || "Text"}
         variant="outlined"
       />;
     case "list-item":
