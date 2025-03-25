@@ -33,26 +33,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post("/api/button-click", async (req, res) => {
-  const { content } = req.body; // Extract the content from the request body
 
-  if (!content) {
-    return res.status(400).json({ error: "Content is required" });
-  }
-
-  console.log("Button clicked with content:", content);
-
-  // Call generateContent with the button content as the prompt
-  try {
-    const buttonPrompt = "The user clicked the button that says: \"" + content + "\". Generate a new UI based on this button click.";
-    
-    await generateContent(content, res);
-    // Send a response back to the button click
-  } catch (error) {
-    console.error("Error generating content for button click:", error.message);
-    res.status(500).json({ error: "Failed to generate content for button click" });
-  }
-});
 
 const generateContent = async (prompt, res) => {
   if(!sessionMessages[9999]) {
@@ -203,6 +184,23 @@ app.post("/api/generate-image", async (req, res) => {
   }
 });
 
+app.post("/api/button-click", async (req, res) => {
+  const { content } = req.body; // Extract the content from the request body
+
+  if (!content) {
+    return res.status(400).json({ error: "Content is required" });
+  }
+
+  console.log("Button clicked with content:", content);
+
+  try {
+    const buttonPrompt = "The user clicked the button that says: \"" + content + "\". Generate a new UI based on this button click.";
+    await generateContent(content, res);
+  } catch (error) {
+    console.error("Error generating content for button click:", error.message);
+    res.status(500).json({ error: "Failed to generate content for button click" });
+  }
+});
 
 let clients = []; // Track connected SSE clients
 
