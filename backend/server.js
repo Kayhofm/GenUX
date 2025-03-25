@@ -1,4 +1,3 @@
-
 import express from "express";
 import cors from "cors";
 import { OpenAI } from "openai";
@@ -27,13 +26,14 @@ let sessionMessages = {}; // Store messages keyed by session ID or user ID
 if(!sessionMessages[999]) sessionMessages[999] = 0;
 let imgID;
 
+// New global variable for model
+let currentModel = "gpt-4o-mini";
+
 // Log all incoming requests
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
-
-
 
 const generateContent = async (prompt, res) => {
   if(!sessionMessages[9999]) {
@@ -60,8 +60,7 @@ const generateContent = async (prompt, res) => {
       .join(""); // Concatenate all messages
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      // model: "o3-mini",
+      model: currentModel,  // changed to use currentModel
       messages: [
         { role: "system", content: systemPrompt01 },
         { role: "user", content: userPrompt01 + prompt},
@@ -185,7 +184,7 @@ app.post("/api/generate-image", async (req, res) => {
 });
 
 app.post("/api/button-click", async (req, res) => {
-  const { content } = req.body; // Extract the content from the request body
+  const { content } = req.body;
 
   if (!content) {
     return res.status(400).json({ error: "Content is required" });
@@ -244,6 +243,17 @@ app.post("/api/images/generate", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+// New endpoint to update model
+app.post("/api/set-model", (req, res) => {
+  const { model } = req.body;
+  if (!model) {
+    return res.status(400).json({ error: "Model is required" });
+  }
+  currentModel = model;
+  console.log("Model updated to:", currentModel);
+  res.status(200).json({ message: "Model updated", model: currentModel });
 });
 
 const PORT = 4000;
