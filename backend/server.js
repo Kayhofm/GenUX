@@ -22,7 +22,6 @@ app.use(
 
 import fs from 'fs';
 const systemPrompt01 = fs.readFileSync('systemPrompt.txt', 'utf8');
-// const systemPrompt01 = prompts.systemPrompt01;
 const userPrompt01 = prompts.userPrompt01;
 let sessionMessages = {}; // Store messages keyed by session ID or user ID
 if(!sessionMessages[999]) sessionMessages[999] = 0;
@@ -248,7 +247,6 @@ app.post("/api/images/generate", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 
 const PORT = 4000;
 app.listen(PORT, () => {
