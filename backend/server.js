@@ -26,7 +26,7 @@ let sessionMessages = {}; // Store messages keyed by session ID or user ID
 if(!sessionMessages[999]) sessionMessages[999] = 0;
 let imgID;
 
-// New global variable for model
+// Global variable for model
 let currentModel = "gpt-4o-mini";
 
 // Log all incoming requests
@@ -60,7 +60,7 @@ const generateContent = async (prompt, res) => {
       .join(""); // Concatenate all messages
 
     const response = await openai.chat.completions.create({
-      model: currentModel,  // changed to use currentModel
+      model: currentModel,
       messages: [
         { role: "system", content: systemPrompt01 },
         { role: "user", content: userPrompt01 + prompt},

@@ -29,7 +29,7 @@ function App() {
             />
           </React.Suspense>
         </section>
-        <section className="UI-section">
+        <section className="UI-section" style={{ width: '480px', marginLeft: '20px' }}>
           <React.Suspense fallback={<div>Loading UI...</div>}>
             <UISection content={content} onContentGenerated={handleContentGenerated} />
           </React.Suspense>

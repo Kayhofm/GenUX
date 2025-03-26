@@ -49,18 +49,24 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
         placeholder="Enter your prompt..."
         rows="4"
         cols="50"
+        style={{ width: '100%' }}
       />
-      <br /><br />
-      <select value={model} onChange={handleModelChange}>
-        <option value="gpt-4o-2024-11-20">gpt-4o</option>
-        <option value="gpt-4o-mini">gpt-4o-mini</option>
-        <option value="gpt-4-turbo">gpt-4-turbo</option>
-      </select>
-      <br /><br />
-      <button onClick={handleGenerate} disabled={loading}>
+      <button
+        onClick={handleGenerate}
+        disabled={loading}
+        style={{ marginTop: '8px', display: 'block', marginLeft: 'auto' }}
+      >
         {loading ? "Generating..." : "Generate Content"}
       </button>
       {error && <p className="error">{error}</p>}
+      <div style={{ marginTop: '20px', textAlign: 'left' }}>
+        <label htmlFor="model-dropdown" style={{ marginRight: '8px' }}>Model</label>
+        <select id="model-dropdown" value={model} onChange={handleModelChange}>
+          <option value="gpt-4o-2024-11-20">gpt-4o</option>
+          <option value="gpt-4o-mini">gpt-4o-mini</option>
+          <option value="gpt-4-turbo">gpt-4-turbo</option>
+        </select>
+      </div>
     </div>
   );
 }

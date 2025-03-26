@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Typography, Button, Fab, Box, TextField, Avatar, ListItem, ListItemAvatar, ListItemText, IconButton, CardMedia, Slider } from '@mui/material';
+import { Typography, Button, Fab, Box, TextField, Avatar, ListItem, ListItemAvatar, ListItemText, IconButton, CardMedia, Slider, Checkbox, Switch } from '@mui/material';
 import * as Icons from '@mui/icons-material';
 
 function DynamicRenderer({ component, onContentGenerated }) {
@@ -81,6 +81,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
   const { type, props } = component;
 
   const widths = {
+    "1": 60,
     "2": 140,
     "3": 220,
     "4": 300,
@@ -97,10 +98,19 @@ function DynamicRenderer({ component, onContentGenerated }) {
       >
         {props.content}
       </Typography>;
+    case "subheader":
+      return <Typography
+        // variant="subtitle1"
+        variant="body1" style={{ fontSize: '1.1rem', fontWeight: 500 }}
+        className={`${type} fade-in`}
+        sx={{ width: `${width}px`, margin: '0px 10px' }}
+      >
+        {props.content}
+      </Typography>;
     case "text":
       return <Box
         className={`${type} fade-in`}
-        sx={{ width: `${width}px`, margin: '10px 10px' }}
+        sx={{ width: `${width}px`, margin: '4px 10px' }}
         >
         {props.content}
       </Box>;
@@ -198,6 +208,10 @@ function DynamicRenderer({ component, onContentGenerated }) {
         >
         {"\u00A0"}
       </Box>;
+    case "checkbox":
+      return <Checkbox {...props} sx={{ width: `60px`, margin: '10px 10px' }} />;
+    case "switch":
+      return <Switch {...props} sx={{ width: `60px`, margin: '10px 10px' }} />;
     default:
       return <Typography variant="body1">Unsupported component type: {type}</Typography>;
   }

@@ -53,6 +53,16 @@
   /* border: 1px solid red; */
 }
 
+.subheader {
+  text-align: left;  
+  color: black;
+  padding-top: 6px;
+  border: none;
+  font-size: 22px;
+  font-weight: bold;
+  /* border: 1px solid red; */
+}
+
 .text {
   text-align: left;  
   display: block;
