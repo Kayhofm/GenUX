@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import './App.css';
-// import "./styles/debug.css";
+import { ThemeProvider } from '@mui/material/styles';
+import { defaultTheme } from './themes';
 
 const ControlPanel = React.lazy(() => import('./components/ControlPanel'));
 const UISection = React.lazy(() => import('./components/UISection'));
@@ -15,27 +16,29 @@ function App() {
   }, []); // No dependencies, ensuring a stable reference
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Generative UX</h1>
-      </header>
-      <main className="App-main">
-        <section className="Control-panel-section">
-          <React.Suspense fallback={<div>Loading Control Panel...</div>}>
-            <ControlPanel
-              onContentGenerated={handleContentGenerated}
-              prompt={prompt}
-              setPrompt={setPrompt}
-            />
-          </React.Suspense>
-        </section>
-        <section className="UI-section" style={{ width: '480px', marginLeft: '20px' }}>
-          <React.Suspense fallback={<div>Loading UI...</div>}>
-            <UISection content={content} onContentGenerated={handleContentGenerated} />
-          </React.Suspense>
-        </section>
-      </main>
-    </div>
+    <ThemeProvider theme={defaultTheme}>
+      <div className="App">
+        <header className="App-header">
+          <h1>Generative UX</h1>
+        </header>
+        <main className="App-main">
+          <section className="Control-panel-section">
+            <React.Suspense fallback={<div>Loading Control Panel...</div>}>
+              <ControlPanel
+                onContentGenerated={handleContentGenerated}
+                prompt={prompt}
+                setPrompt={setPrompt}
+              />
+            </React.Suspense>
+          </section>
+          <section className="UI-section" style={{ width: '480px', marginLeft: '20px' }}>
+            <React.Suspense fallback={<div>Loading UI...</div>}>
+              <UISection content={content} onContentGenerated={handleContentGenerated} />
+            </React.Suspense>
+          </section>
+        </main>
+      </div>
+    </ThemeProvider>
   );
 }
 
