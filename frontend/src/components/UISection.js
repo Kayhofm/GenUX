@@ -38,10 +38,10 @@ function UISection({ content, onContentGenerated, ...props }) {
     <Box
       {...props}
       style={{
-        display: "flex", // added flex display to render components side by side
-        flexWrap: "wrap", // allow wrapping if needed
+        display: "flex",
+        flexWrap: "wrap",
         backgroundColor: theme.palette.background.default,
-        width: "480px", // added fixed width
+        width: "480px",
         ...props.style
       }}
     >
