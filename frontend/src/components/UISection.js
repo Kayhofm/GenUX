@@ -45,18 +45,22 @@ function UISection({ content, onContentGenerated, ...props }) {
         ...props.style
       }}
     >
-      {content.map((component, index) => (
-        <DynamicRenderer
-          key={index}
-          component={{
-            ...component,
-            props: {
-              ...component.props,
-              imageSrc: imageMap[component.props.imageID] || component.props.imageSrc || "/img/default-image.png",
-            },
-          }}
-          onContentGenerated={onContentGenerated}
-        />
+      {content
+        .filter(component => component && component.type && component.props) // ignore theme-only messages
+        .map((component, index) => (
+          <DynamicRenderer
+            key={index}
+            component={{
+              ...component,
+              props: {
+                ...component.props,
+                imageSrc: component.props.imageID 
+                  ? (imageMap[component.props.imageID] || component.props.imageSrc || "/img/default-image.png")
+                  : (component.props.imageSrc || "/img/default-image.png"),
+              },
+            }}
+            onContentGenerated={onContentGenerated}
+          />
       ))}
     </Box>
   );
