@@ -11,14 +11,19 @@ function App() {
   const [prompt, setPrompt] = useState(""); // User input prompt
   const [currentTheme, setCurrentTheme] = useState(defaultTheme); // Manage theme with state
 
-  // Wrap setContent in useCallback for stability
   const handleContentGenerated = useCallback((newContent) => {
-    setContent(newContent);
-
-    if(newContent.theme !== undefined){
-      setCurrentTheme(newContent.theme);
+    // Resolve newContent if it's a function
+    const resolvedContent = typeof newContent === 'function' ? newContent(content) : newContent;
+    
+    // Directly extract the theme from the first element
+    const themeValue = resolvedContent[0]?.theme;
+    if (themeValue) {
+      const themeMap = { defaultTheme, darkTheme };
+      setCurrentTheme(themeMap[themeValue] || defaultTheme); // Map themeValue correctly
     }
-  }, []); // No dependencies, ensuring a stable reference
+    
+    setContent(newContent);
+  }, [content]);
 
   return (
     <ThemeProvider theme={currentTheme}>
