@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import './App.css';
 import { ThemeProvider } from '@mui/material/styles';
-import { defaultTheme, darkTheme } from './themes';
+import { defaultTheme, darkTheme, natureTheme, modernTheme } from './themes';
 
 const ControlPanel = React.lazy(() => import('./components/ControlPanel'));
 const UISection = React.lazy(() => import('./components/UISection'));
@@ -11,19 +11,19 @@ function App() {
   const [prompt, setPrompt] = useState(""); // User input prompt
   const [currentTheme, setCurrentTheme] = useState(defaultTheme); // Manage theme with state
 
-  const handleContentGenerated = useCallback((newContent) => {
-    // Resolve newContent if it's a function
-    const resolvedContent = typeof newContent === 'function' ? newContent(content) : newContent;
-    
-    // Directly extract the theme from the first element
-    const themeValue = resolvedContent[0]?.theme;
-    if (themeValue) {
-      const themeMap = { defaultTheme, darkTheme };
-      setCurrentTheme(themeMap[themeValue] || defaultTheme); // Map themeValue correctly
+  // Handle theme changes separately
+  useEffect(() => {
+    if (content && content[0]?.theme) {
+      const themeValue = content[0].theme;
+      const themeMap = { defaultTheme, darkTheme, natureTheme, modernTheme };
+      setCurrentTheme(themeMap[themeValue] || defaultTheme);
     }
-    
-    setContent(newContent);
   }, [content]);
+
+  // Handle content generation from ControlPanel
+  const handleContentGenerated = useCallback((newContent) => {
+    setContent(newContent);
+  }, []);
 
   return (
     <ThemeProvider theme={currentTheme}>
