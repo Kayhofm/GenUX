@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Typography, Button, Fab, Box, TextField, Avatar, ListItem, ListItemAvatar, ListItemText, IconButton, CardMedia, Slider, Checkbox, Switch } from '@mui/material';
+import { Typography, Button, Fab, Box, TextField, Avatar, ListItem, ListItemAvatar, ListItemText, IconButton, CardMedia, Slider, Checkbox, Switch, List } from '@mui/material';
 import * as Icons from '@mui/icons-material';
 import { useFormContext } from '../context/FormContext';
 
@@ -120,6 +120,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
     case "header":
       return <Typography
         variant="h5"
+        color="text.primary"
         className={`${type} fade-in`}
         sx={{ width: `${width}px`, margin: '10px 10px' }}
       >
@@ -127,20 +128,23 @@ function DynamicRenderer({ component, onContentGenerated }) {
       </Typography>;
     case "subheader":
       return <Typography
-        // variant="subtitle1"
-        variant="body1" style={{ fontSize: '1.1rem', fontWeight: 500 }}
+        variant="body1" 
+        color="text.primary"
+        style={{ fontSize: '1.1rem', fontWeight: 500 }}
         className={`${type} fade-in`}
         sx={{ width: `${width}px`, margin: '0px 10px' }}
       >
         {props.content}
       </Typography>;
     case "text":
-      return <Box
+      return <Typography
+        variant="body1"
+        color="text.primary"
         className={`${type} fade-in`}
         sx={{ width: `${width}px`, margin: '4px 10px' }}
-        >
+      >
         {props.content}
-      </Box>;
+      </Typography>;
     case "button":
       return (
         <Button
@@ -221,7 +225,13 @@ function DynamicRenderer({ component, onContentGenerated }) {
             style={{ width: `40px` }}
           />
         </ListItemAvatar>
-        <ListItemText primary={props.content || "Default header"} />
+        <ListItemText 
+          primary={
+            <Typography color="text.primary">
+              {props.content || "Default header"}
+            </Typography>
+          } 
+        />
       </ListItem>;
     case "slider":
       return <Slider
