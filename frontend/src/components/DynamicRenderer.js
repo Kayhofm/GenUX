@@ -1,18 +1,43 @@
 import React, { useState } from "react";
 import { Typography, Button, Fab, Box, TextField, Avatar, ListItem, ListItemAvatar, ListItemText, IconButton, CardMedia, Slider, Checkbox, Switch } from '@mui/material';
 import * as Icons from '@mui/icons-material';
+import { useFormContext } from '../context/FormContext';
 
 function DynamicRenderer({ component, onContentGenerated }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { formValues, updateFormValue, getFormValues, clearFormValues } = useFormContext();
+
+  const handleInputChange = (id, value) => {
+    if (!id) {
+      console.error('No ID provided for input change');
+      return;
+    }
+    console.log(`Setting form value for ID: ${id}, value: ${value}`);
+    updateFormValue(id, value);
+  };
 
   const handleClick = () => {
     if (component.type === "button") {
+      const currentFormValues = getFormValues();
+      console.log('Form values at click:', currentFormValues);
+      
+      // Only proceed if we have form values
+      const formDescription = Object.entries(currentFormValues)
+        .filter(([_, value]) => value !== undefined && value !== '')
+        .map(([key, value]) => `${key}: ${value}`)
+        .join(', ');
+      
+      console.log('Form description:', formDescription);
       setLoading(true);
-      const buttonPrompt = `The user clicked the button that says: "${component.props.content}". Generate a new UI based on this button click.`;
-  
-      // Clear previous content
-      onContentGenerated([]); // Reset content before fetching new data
+
+      // Only include form values in prompt if they exist
+      const buttonPrompt = `The user clicked the button that says: "${component.props.content}"${
+        formDescription ? `. Form values are: ${formDescription}` : ''
+      }. Generate a new UI based on this input.`;
+
+      // Reset content before fetching new data
+      onContentGenerated([]);
 
       fetch("http://localhost:4000/api/button-click", {
         method: "POST",
@@ -25,6 +50,8 @@ function DynamicRenderer({ component, onContentGenerated }) {
           if (!response.ok) {
             throw new Error("Failed to fetch from the server");
           }
+          // Clear form values only after successful API call
+          clearFormValues();
           return response.body.getReader();
         })
         .then((reader) => {
@@ -172,12 +199,15 @@ function DynamicRenderer({ component, onContentGenerated }) {
         sx={{ width: `${width}px`, height: `${width}px`, margin: '10px 10px' }}
       />;
     case "textInput":
+      const inputId = props.ID || props.id;
       return <TextField
         type="text"
         className={`${type} fade-in`}
         sx={{ width: `${width}px`, margin: '10px 10px' }}
         placeholder={props.content || "Text"}
         variant="outlined"
+        value={formValues[inputId] || ''}
+        onChange={(e) => handleInputChange(inputId, e.target.value)}
       />;
     case "list-item":
       return <ListItem
@@ -209,9 +239,15 @@ function DynamicRenderer({ component, onContentGenerated }) {
         {"\u00A0"}
       </Box>;
     case "checkbox":
+      const checkboxId = props.ID || props.id;
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Checkbox {...props} sx={{ width: `42px`, margin: '10px 10px' }} />
+          <Checkbox 
+            {...props} 
+            sx={{ width: `42px`, margin: '10px 10px' }}
+            checked={formValues[checkboxId] || false}
+            onChange={(e) => handleInputChange(checkboxId, e.target.checked)}
+          />
           <TextField
             value={props.content}
             variant="standard"
@@ -219,7 +255,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
             InputProps={{
               disableUnderline: true
             }}
-            sx={{ width: `${width - 42}px`, margin: '10px 0' }}
+            sx={{ width: `${width - 42}px`, margin: '0px 0' }}
           />
         </Box>
       );
