@@ -16,23 +16,28 @@ function App() {
 
   // Handle theme changes separately
   useEffect(() => {
-    // Handle theme
     if (content && content[0]?.theme) {
       const themeValue = content[0].theme;
       const themeMap = { defaultTheme, darkTheme, natureTheme, modernTheme };
       setCurrentTheme(themeMap[themeValue] || defaultTheme);
     }
-
-    // Find rationale component in the array
+    // Look for rationale component
     const rationaleComponent = content.find(item => item?.type === 'rationale');
     if (rationaleComponent) {
-      setRationale(rationaleComponent.content);
+      setRationale(Array.isArray(rationaleComponent.content) 
+        ? rationaleComponent.content 
+        : [rationaleComponent.content]);
     }
   }, [content]);
 
   // Handle content generation from ControlPanel
   const handleContentGenerated = useCallback((newContent) => {
-    setContent(newContent);
+    // If single component with type 'rationale', wrap in array
+    if (newContent?.type === 'rationale') {
+      setContent([newContent]);
+    } else {
+      setContent(Array.isArray(newContent) ? newContent : [newContent]);
+    }
   }, []);
 
   return (

@@ -15,9 +15,15 @@ Your output should consist solely of these JSON objects that define the UI. Do n
             "columns": "2"
         }
     }
+    {
+        "type": "rationale",
+        "content": ["1. Included a button to fulfill the request.", "2. Utilized full width for a prominent display."]
+    }
 ]
 
 At the beginning of the JSON stream, define the theme, which can be "defaultTheme", "darkTheme", "natureTheme", "or "modernTheme".
+
+At the end of the JSON stream, always list the rationale of the design decisions, in a component with the type "rationale".
 
 Components from the Material design system are used. Their type can be: "header", "subheader" "text", "image", "avatar", "button", "iconButton", "icon", "list-item", "textInput", "checkbox", "switch" or "space". "ID" is a unique number identifying that component. Each component must have a unique ID. For each subsequent user request, continue numbering IDs from the previous request. For an image, describe the image in extensive detail in the "content" property. The image will be generated based on the description. Use only the fields listed in the example.
 
