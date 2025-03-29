@@ -119,7 +119,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
         <Button
           variant="contained"
           className={`${type} fade-in`}
-          sx={{ width: `${width}px`, margin: '10px 10px' }}
+          sx={{ width: `${width}px`, margin: '10px 10px', maxHeight: '61px' }}
           onClick={handleClick}
           disabled={loading}
         >
@@ -209,7 +209,20 @@ function DynamicRenderer({ component, onContentGenerated }) {
         {"\u00A0"}
       </Box>;
     case "checkbox":
-      return <Checkbox {...props} sx={{ width: `60px`, margin: '10px 10px' }} />;
+      return (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Checkbox {...props} sx={{ width: `42px`, margin: '10px 10px' }} />
+          <TextField
+            value={props.content}
+            variant="standard"
+            disabled={true}
+            InputProps={{
+              disableUnderline: true
+            }}
+            sx={{ width: `${width - 42}px`, margin: '10px 0' }}
+          />
+        </Box>
+      );
     case "switch":
       return <Switch {...props} sx={{ width: `60px`, margin: '10px 10px' }} />;
     default:
