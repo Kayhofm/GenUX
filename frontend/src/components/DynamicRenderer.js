@@ -210,14 +210,21 @@ function DynamicRenderer({ component, onContentGenerated }) {
         {props.content}
       </Typography>;
     case "text":
-      return <Typography
-        variant="body1"
-        color="text.primary"
-        className={`${type} fade-in`}
-        sx={{ width: `${width}px`, margin: '4px 10px' }}
-      >
-        {props.content}
-      </Typography>;
+      return (
+        <Typography
+          variant="body1"
+          color="text.primary"
+          className={`${type} fade-in`}
+          sx={{ width: `${width}px`, margin: '4px 10px' }}
+        >
+          {props.content.split('\n').map((line, i) => (
+            <React.Fragment key={i}>
+              {line}
+              {i < props.content.split('\n').length - 1 && <br />}
+            </React.Fragment>
+          ))}
+        </Typography>
+      );
     case "button":
       return (
         <Button
@@ -273,7 +280,13 @@ function DynamicRenderer({ component, onContentGenerated }) {
         src={props.imageSrc || "/img/default-image.png"}
         alt={props.content}
         className={`${type} fade-in`}
-        sx={{ width: `${width}px`, height: `${width}px`, margin: '10px 10px' }}
+        sx={{ 
+          width: `${width}px`,
+          height: `${width}px`,
+          margin: '10px 10px',
+          objectFit: 'contain',
+          backgroundColor: 'white',
+        }}
       />;
     case "textInput":
       const inputId = props.ID || props.id;
@@ -344,9 +357,11 @@ function DynamicRenderer({ component, onContentGenerated }) {
       );
     case "switch":
       return <Switch {...props} sx={{ width: `60px`, margin: '10px 10px' }} />;
-    case "product-list":
+    /*
+      case "product-list":
       handleFunction();
       return null; // Return null to avoid rendering anything for this case
+      */
     default:
       return <Typography variant="body1">Unsupported component type: {type}</Typography>;
   }

@@ -25,14 +25,17 @@ At the beginning of the JSON stream, define the theme, which can be "defaultThem
 
 At the end of the JSON stream, always list the rationale of the design decisions, in a component with the type "rationale".
 
-Components from the Material design system are used. Their type can be: "header", "subheader" "text", "image", "avatar", "button", "iconButton", "icon", "list-item", "textInput", "checkbox", "switch" or "space". "ID" is a unique number identifying that component. Each component must have a unique ID. For each subsequent user request, continue numbering IDs from the previous request. For an image, describe the image in extensive detail in the "content" property. The image will be generated based on the description. Use only the fields listed in the example.
+Components from the Material design system are used. Their type can be: "header", "subheader" "text", "image", "avatar", "button", "iconButton", "icon", "list-item", "textInput", "checkbox", "switch" or "space". "ID" is a unique number identifying that component. Each component must have a unique ID. For each subsequent user request, continue numbering IDs from the previous request. Use only the fields listed in the example.
+
+image
+If you know the URL of the image as a result of tool calling, put the URL of the image that was returned from the tool call in the "props.imageSrc" property. Otherwise, describe the image in extensive detail in the "content" property. The image will then be generated based on the description.
 
 Columns
 The UI layout is 6 columns wide. For every component, you must explicitly specify its column width.
 
 Always create the most efficient layout by arranging components to fully occupy each row. For example, use two components that are each 3 columns wide to fill a row, or three components that are each 2 columns wide. A checkbox and a switch are always exactly 1 column wide.
 
-Every row must add up to exactly 6 columns. Never display incomplete rows. Never define rows of 7 columns. Only use layouts where the total column widths of the components in each row equal 6. Valid examples include:
+Every row must add up to exactly 6 columns. Never display incomplete rows. Only use layouts where the total column widths of the components in each row equal 6. Valid examples include:
 	•	6
 	•	3 + 3
 	•	2 + 2 + 2
@@ -41,7 +44,9 @@ Every row must add up to exactly 6 columns. Never display incomplete rows. Never
 	•	4 + 2
 	•	1 + 5
 
-You may use one or more empty "space" components to reach the width of 6 columns when needed. For example, if displaying three "iconButton" components that are each 1 column wide, add three "space" components (also 1 column wide each) to complete the row. These can be placed between the "iconButton" components.
+Use one or more empty "space" components to reach the width of 6 columns when needed. For example:
+	•	if displaying three "iconButton" components that are each 1 column wide, add three "space" components (also 1 column wide each) to complete the row. These can be placed between the "iconButton" components.
+	•	If you want to show a single 2-column button in a row, add a 4-column space to fill out the row to 6 columns.
 
 Components you describe will be translated to HTML by the application and displayed using the Material design system.
 

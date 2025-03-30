@@ -104,8 +104,18 @@ const generateContent = async (prompt, res) => {
         // Try to parse complete function call
         try {
           const args = JSON.parse(toolCallBuffer.arguments);
-          console.log("Complete function call:", toolCallBuffer.name, args);
+          console.log("Completing function call:", toolCallBuffer.name, args);
           
+          console.log("Sending wait component:\n");
+          res.write(`data: ${JSON.stringify({
+            type: "text",
+            props: {
+              content: "\n Retrieving data, please wait...",
+              ID: "9999",
+              columns: "6"
+            }
+          })}\n\n`);
+
           if (toolCallBuffer.name === 'get_products') {
             const products = await getAmazonProducts(args.query);
             
@@ -138,6 +148,7 @@ const generateContent = async (prompt, res) => {
                     const tempParsedData = JSON.parse(tempBuffer);
                     if (Array.isArray(tempParsedData)) {
                       tempParsedData.forEach(item => {
+                        console.log("Sending function component:\n", item);
                         res.write(`data: ${JSON.stringify(item)}\n\n`);
                       });
                       productBuffer = "";
@@ -212,22 +223,7 @@ const generateContent = async (prompt, res) => {
                     item.props.imageSrc = "/img/default-image.png"; // Fallback image
                   }
                 }
-/*
-                if (item.type === "function") {
-                  try {
-                    console.log("Getting product data");
-                    const products = await getAmazonProducts(item.function.arguments);
-                    item.props.products = products;
-                    console.log("Sending product data");
-                    // res.write(`data: ${JSON.stringify(item)}\n\n`);
-                  } catch (error) {
-                    console.error("Error fetching Amazon products:", error);
-                    item.props.error = "Failed to fetch products";
-                    // res.write(`data: ${JSON.stringify(item)}\n\n`);
-                  }
-                  // continue; // Skip the default sending since we've handled it here
-                }
-*/
+
                 console.log("Sending component:\n", item);
                 res.write(`data: ${JSON.stringify(item)}\n\n`);
               });
