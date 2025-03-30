@@ -101,6 +101,79 @@ function DynamicRenderer({ component, onContentGenerated }) {
     }
   };
 
+  const handleFunction = () => {
+    if (component.type === "function") {
+
+      setLoading(true);
+
+      // Only include form values in prompt if they exist
+      const functionPrompt = component.props.products;
+
+      // Reset content before fetching new data
+      onContentGenerated([]);
+
+      fetch("http://localhost:4000/api/button-click", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: functionPrompt }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to fetch from the server");
+          }
+          // Clear form values only after successful API call
+          clearFormValues();
+          return response.body.getReader();
+        })
+        .then((reader) => {
+          const decoder = new TextDecoder();
+          let buffer = "";
+  
+          // Process the streamed response
+          function read() {
+            reader.read().then(({ done, value }) => {
+              if (done) {
+                setLoading(false);
+                console.log("Streaming complete.");
+                return;
+              }
+  
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split("\n\n");
+              buffer = lines.pop(); // Save the last incomplete line to buffer
+  
+              lines.forEach((line) => {
+                if (line.startsWith("data:")) {
+                  const jsonData = line.slice(5).trim(); // Remove "data:" prefix
+                  try {
+                    if (jsonData === "[DONE]") {
+                      console.log("Streaming complete."); // Log completion
+                      return; // Exit processing for [DONE]
+                    }
+                    const parsedData = JSON.parse(jsonData);
+                    console.log("Streaming data:", parsedData);
+                    onContentGenerated((prev) => [...prev, parsedData]); // Append new data
+                  } catch (error) {
+                    console.error("Error parsing streamed data:", error);
+                  }
+                }
+              });
+  
+              read(); // Continue reading
+            });
+          }
+          read();
+        })
+        .catch((err) => {
+          console.error("Error during fetch:", err);
+          setError("Failed to fetch content. Please try again.");
+          setLoading(false);
+        });
+    }
+  };
+
   if (!component || !component.type || !component.props) {
     return <Typography variant="body1">Invalid component structure.</Typography>;
   }
@@ -271,6 +344,9 @@ function DynamicRenderer({ component, onContentGenerated }) {
       );
     case "switch":
       return <Switch {...props} sx={{ width: `60px`, margin: '10px 10px' }} />;
+    case "product-list":
+      handleFunction();
+      return null; // Return null to avoid rendering anything for this case
     default:
       return <Typography variant="body1">Unsupported component type: {type}</Typography>;
   }

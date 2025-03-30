@@ -4,11 +4,15 @@ import { OpenAI } from "openai";
 import prompts from "./prompts.json" with { type: "json" };
 import { generateImage, generateImageDalle, getImageStore, imageEventEmitter } from "./imageCreator.js";
 import dotenv from "dotenv";
+import toolDefinition from "./toolDefinition.json" with { type: "json" };
+import { getAmazonProducts } from "./toolAmazon.js";
 dotenv.config(); // Load environment variables
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+const tools = toolDefinition;
 
 const app = express();
 app.use(cors());
@@ -66,6 +70,8 @@ const generateContent = async (prompt, res) => {
         { role: "user", content: userPrompt01 + prompt},
         { role: "assistant", content: contextWindow }, // Add full previous response
       ],
+      tools,
+      tool_choice: "auto",
       // temperature: 0.7, // Controls randomness in the output
       // top_p: 0.9, // Controls diversity via nucleus sampling
       // max_tokens: 500,
@@ -76,13 +82,88 @@ const generateContent = async (prompt, res) => {
 
     let buffer = ""; // Accumulate fragments of JSON
     let fullMessage = "";
+    let toolCallBuffer = null; // Buffer for tool calls
 
     for await (const chunk of response) {
-      const content = chunk.choices[0]?.delta?.content;
+      const delta = chunk.choices[0]?.delta;
+      
+      // Handle tool calls
+      if (delta?.tool_calls) {
+        const toolCall = delta.tool_calls[0];
+        if (!toolCallBuffer) {
+          toolCallBuffer = {
+            name: toolCall.function?.name || '',
+            arguments: toolCall.function?.arguments || ''
+          };
+        } else {
+          if (toolCall.function?.arguments) {
+            toolCallBuffer.arguments += toolCall.function.arguments;
+          }
+        }
 
-      if (content) {
-        buffer += content; // Accumulate chunk
-        fullMessage += content;
+        // Try to parse complete function call
+        try {
+          const args = JSON.parse(toolCallBuffer.arguments);
+          console.log("Complete function call:", toolCallBuffer.name, args);
+          
+          if (toolCallBuffer.name === 'get_products') {
+            const products = await getAmazonProducts(args.query);
+            
+            // Create a new OpenAI chat completion for processing the products
+            const productResponse = await openai.chat.completions.create({
+              model: currentModel,
+              messages: [
+                { role: "system", content: systemPrompt01 },
+                { role: "user", content: `Generate UI components to display these Amazon products: ${JSON.stringify(products.results)}` }
+              ],
+              stream: true,
+            });
+
+            // Process the streaming response using the same buffer logic as the main content
+            let productBuffer = "";
+            for await (const chunk of productResponse) {
+              const content = chunk.choices[0]?.delta?.content;
+              if (content) {
+                productBuffer += content;
+                try {
+                  // Use the same JSON parsing logic as the main content stream
+                  let tempBuffer = productBuffer;
+                  if (tempBuffer.startsWith('[')) tempBuffer = tempBuffer.slice(1);
+                  if (tempBuffer.endsWith(']')) tempBuffer = tempBuffer.slice(0, -1);
+                  if (tempBuffer.endsWith(',')) tempBuffer = tempBuffer.slice(0, -1);
+                  
+                  tempBuffer = `[${tempBuffer}]`;
+                  
+                  try {
+                    const tempParsedData = JSON.parse(tempBuffer);
+                    if (Array.isArray(tempParsedData)) {
+                      tempParsedData.forEach(item => {
+                        res.write(`data: ${JSON.stringify(item)}\n\n`);
+                      });
+                      productBuffer = "";
+                    }
+                  } catch (error) {
+                    // Incomplete JSON, continue accumulating
+                  }
+                } catch (err) {
+                  continue;
+                }
+              }
+            }
+            toolCallBuffer = null;
+          }
+        } catch (error) {
+          // If JSON.parse fails, we don't have complete arguments yet
+          if (!(error instanceof SyntaxError)) {
+            console.error("Function execution error:", error);
+          }
+        }
+      }
+      
+      // Handle regular content
+      else if (delta?.content) {
+        buffer += delta.content;
+        fullMessage += delta.content;
 
         try {
           let tempBuffer = buffer;
@@ -110,9 +191,9 @@ const generateContent = async (prompt, res) => {
           
             if (Array.isArray(tempParsedData)) {
               // Send each new component individually
-              tempParsedData.forEach((item, index) => {
+              tempParsedData.forEach(async (item, index) => {
                
-                if(item.type === "image" || item.type === "list-item") {
+                if (item.type === "image" || item.type === "list-item") {
                   if (typeof imgID === "undefined" || imgID === null) {
                     imgID = 1;
                   } else {
@@ -122,7 +203,7 @@ const generateContent = async (prompt, res) => {
                   item.props.imageSrc = "";
                   item.props.imageID = imgID;
                   
-                  // Request image from imageCreator here
+                  // Request image from imageCreator
                   // Generate the image and update the item's props
                   try {
                     const imageUrl = generateImage(imgID, item.props.columns, item.props.content || "a broken image");
@@ -131,6 +212,22 @@ const generateContent = async (prompt, res) => {
                     item.props.imageSrc = "/img/default-image.png"; // Fallback image
                   }
                 }
+/*
+                if (item.type === "function") {
+                  try {
+                    console.log("Getting product data");
+                    const products = await getAmazonProducts(item.function.arguments);
+                    item.props.products = products;
+                    console.log("Sending product data");
+                    // res.write(`data: ${JSON.stringify(item)}\n\n`);
+                  } catch (error) {
+                    console.error("Error fetching Amazon products:", error);
+                    item.props.error = "Failed to fetch products";
+                    // res.write(`data: ${JSON.stringify(item)}\n\n`);
+                  }
+                  // continue; // Skip the default sending since we've handled it here
+                }
+*/
                 console.log("Sending component:\n", item);
                 res.write(`data: ${JSON.stringify(item)}\n\n`);
               });
@@ -185,16 +282,18 @@ app.post("/api/generate-image", async (req, res) => {
 
 app.post("/api/button-click", async (req, res) => {
   const { content } = req.body;
+  console.log("Button click attempted with content:", JSON.stringify(content));
 
-  if (!content) {
-    return res.status(400).json({ error: "Content is required" });
+  if (!content || typeof content === 'object') {
+    console.log("Rejected button click due to invalid content type");
+    return res.status(400).json({ error: "Invalid button content" });
   }
 
   console.log("Button clicked with content:", content);
 
   try {
     const buttonPrompt = "The user clicked the button that says: \"" + content + "\". Generate a new UI based on this button click.";
-    await generateContent(content, res);
+    await generateContent(buttonPrompt, res);
   } catch (error) {
     console.error("Error generating content for button click:", error.message);
     res.status(500).json({ error: "Failed to generate content for button click" });
