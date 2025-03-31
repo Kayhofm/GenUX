@@ -134,6 +134,15 @@ const generateContent = async (prompt, res) => {
 
             // Process the streaming response using the same buffer logic as the main content
             let productBuffer = "";
+
+            console.log("Removing wait component\n");
+            res.write(`data: ${JSON.stringify({
+              type: "remove",
+              props: {
+                ID: "9999",
+              }
+            })}\n\n`);
+
             for await (const chunk of productResponse) {
               const content = chunk.choices[0]?.delta?.content;
               if (content) {

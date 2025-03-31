@@ -357,11 +357,11 @@ function DynamicRenderer({ component, onContentGenerated }) {
       );
     case "switch":
       return <Switch {...props} sx={{ width: `60px`, margin: '10px 10px' }} />;
-    /*
-      case "product-list":
-      handleFunction();
-      return null; // Return null to avoid rendering anything for this case
-      */
+    case "remove":
+      if (props.ID) {
+        onContentGenerated(prev => prev.filter(item => item.props?.ID !== props.ID));
+      }
+      return null;
     default:
       return <Typography variant="body1">Unsupported component type: {type}</Typography>;
   }
