@@ -72,6 +72,7 @@ const generateContent = async (prompt, res) => {
       ],
       tools,
       tool_choice: "auto",
+      // response_format: {"type": "json_object"},
       // temperature: 0.7, // Controls randomness in the output
       // top_p: 0.9, // Controls diversity via nucleus sampling
       // max_tokens: 500,
@@ -125,7 +126,8 @@ const generateContent = async (prompt, res) => {
               model: currentModel,
               messages: [
                 { role: "system", content: systemPrompt01 },
-                { role: "user", content: `Generate UI components to display these Amazon products: ${JSON.stringify(products.results)}` }
+                { role: "user", content: `Generate UI components with these products to respond to the user prompt: ${JSON.stringify(products.results)}. The original user prompt was: `, prompt },
+                { role: "assistant", content: contextWindow }
               ],
               stream: true,
             });
@@ -139,9 +141,19 @@ const generateContent = async (prompt, res) => {
                 try {
                   // Use the same JSON parsing logic as the main content stream
                   let tempBuffer = productBuffer;
-                  if (tempBuffer.startsWith('[')) tempBuffer = tempBuffer.slice(1);
-                  if (tempBuffer.endsWith(']')) tempBuffer = tempBuffer.slice(0, -1);
-                  if (tempBuffer.endsWith(',')) tempBuffer = tempBuffer.slice(0, -1);
+                  if (tempBuffer.startsWith('[')) {
+                    tempBuffer = tempBuffer.slice(1); // Remove the first character
+                  }
+                  if (tempBuffer.endsWith(']')) {
+                    tempBuffer = tempBuffer.slice(0, -1); // Remove the last character
+                  }
+                  if (tempBuffer.endsWith(',')) {
+                    tempBuffer = tempBuffer.slice(0, -1); // Remove the last comma
+                  } else if (tempBuffer.charAt(tempBuffer.length - 2) === ',') {
+                    tempBuffer = tempBuffer.slice(0, -2) + tempBuffer.slice(-1); // Remove the second-to-last comma
+                  } else if (tempBuffer.charAt(tempBuffer.length - 3) === ',') {
+                    tempBuffer = tempBuffer.slice(0, -3) + tempBuffer.slice(-2); // Remove the third-to-last comma
+                  }
                   
                   tempBuffer = `[${tempBuffer}]`;
                   
