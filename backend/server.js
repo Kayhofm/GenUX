@@ -161,6 +161,25 @@ const generateContent = async (prompt, res) => {
                     const tempParsedData = JSON.parse(tempBuffer);
                     if (Array.isArray(tempParsedData)) {
                       tempParsedData.forEach(item => {
+                        if (item.type === "list-item") {
+                          if (typeof imgID === "undefined" || imgID === null) {
+                            imgID = 1000;
+                          } else {
+                            imgID++;
+                          }
+                          
+                          item.props.imageSrc = "";
+                          item.props.imageID = imgID;
+                          
+                          // Request image from imageCreator
+                          // Generate the image and update the item's props
+                          try {
+                            const imageUrl = generateImage(imgID, item.props.columns, item.props.content || "a broken image");
+                          } catch (error) {
+                            console.error("Error generating image:", error.message);
+                            item.props.imageSrc = "/img/default-image.png"; // Fallback image
+                          }
+                        }
                         console.log("Sending function component:\n", item);
                         res.write(`data: ${JSON.stringify(item)}\n\n`);
                       });
