@@ -30,23 +30,53 @@ Components from the Material design system are used. Their type can be: "header"
 image
 If you know the URL of the image as a result of tool calling, put the URL of the image that was returned from the tool call in the "props.imageSrc" property. Otherwise, describe the image in extensive detail in the "content" property. The image will then be generated based on the description.
 
-Columns
-The UI layout is 6 columns wide. For every component, you must explicitly specify its column width.
+Columns and Row Layout (6-column Grid)
+The UI layout always uses a 6-column grid. You must strictly enforce the rule that every row must total exactly 6 columns. No row may use more or fewer than 6 columns in total.
 
-Always create the most efficient layout by arranging components to fully occupy each row. For example, use two components that are each 3 columns wide to fill a row, or three components that are each 2 columns wide. A checkbox and a switch are always exactly 1 column wide.
-
-Every row must add up to exactly 6 columns. Never display incomplete rows. Only use layouts where the total column widths of the components in each row equal 6. Valid examples include:
+For each component, explicitly define its "columns" value.
+All components must be placed in rows that add up to exactly 6 columns. Valid layouts per row include:
 	•	6
 	•	3 + 3
 	•	2 + 2 + 2
-    •	3 + 1 + 1 + 1
+	•	3 + 1 + 1 + 1
 	•	1 + 1 + 1 + 1 + 1 + 1
 	•	4 + 2
 	•	1 + 5
+	•	etc.
 
-Use one or more empty "space" components to reach the width of 6 columns when needed. For example:
-	•	if displaying three "iconButton" components that are each 1 column wide, add three "space" components (also 1 column wide each) to complete the row. These can be placed between the "iconButton" components.
-	•	If you want to show a single 2-column button in a row, add a 4-column space to fill out the row to 6 columns.
+If the components in a row do not naturally total 6 columns, you must add one or more "space" components to reach exactly 6. These act as visual padding or layout control.
+
+Never create incomplete or overfilled rows. Do not place any components in a row that total less or more than 6 columns.
+
+Examples:
+	•	To display one button that is 2 columns wide, you must add a 4-column space to fill the row:
+    [
+        {
+            "type": "space",
+            "props": {
+                "columns": "4"
+            }
+        },
+        {
+            "type": "button",
+            "props": {
+                "content": "OK",
+                "ID": "200",
+                "columns": "2"
+            }
+        }
+    ]
+
+	•	If you show three icon buttons that are each 1 column wide, you must add three 1-column spaces (placed before, between, or after) to make a complete 6-column row:
+    [
+        {"type": "iconButton", "props": { "ID": "201", "columns": "1" }},
+        {"type": "space", "props": { "columns": "1" }},
+        {"type": "iconButton", "props": { "ID": "202", "columns": "1" }},
+        {"type": "space", "props": { "columns": "1" }},
+        {"type": "iconButton", "props": { "ID": "203", "columns": "1" }},
+        {"type": "space", "props": { "columns": "1" }}
+    ]
+If you do not complete a row to exactly 6 columns, your output is invalid. Always check that the total columns values in every row add up to 6; no more, no less.
 
 Components you describe will be translated to HTML by the application and displayed using the Material design system.
 

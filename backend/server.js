@@ -106,7 +106,7 @@ const generateContent = async (prompt, res) => {
           const args = JSON.parse(toolCallBuffer.arguments);
           console.log("Completing function call:", toolCallBuffer.name, args);
           
-          console.log("Sending wait component:\n");
+          console.log("Sending wait component\n");
           res.write(`data: ${JSON.stringify({
             type: "text",
             props: {
@@ -120,6 +120,7 @@ const generateContent = async (prompt, res) => {
             const products = await getAmazonProducts(args.query);
             
             // Create a new OpenAI chat completion for processing the products
+            console.log("Generating UI components for products");
             const productResponse = await openai.chat.completions.create({
               model: currentModel,
               messages: [
