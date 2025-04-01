@@ -39,6 +39,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
     if (isListening) {
       recognition.stop();
     } else {
+      setPrompt(''); // Clear the input field before starting voice input
       recognition.start();
       setIsListening(true);
     }
