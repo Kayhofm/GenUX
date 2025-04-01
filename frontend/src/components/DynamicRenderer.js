@@ -314,7 +314,12 @@ function DynamicRenderer({ component, onContentGenerated }) {
         <ListItemText 
           primary={
             <Typography color="text.primary">
-              {props.content || "Default header"}
+              {props.content.split('\n').map((line, i) => (
+                <React.Fragment key={i}>
+                  {line}
+                  {i < props.content.split('\n').length - 1 && <br />}
+                </React.Fragment>
+              ))}
             </Typography>
           } 
         />
