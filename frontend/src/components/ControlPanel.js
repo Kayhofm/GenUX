@@ -1,12 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { streamOpenAIContent } from "../services/openaiService";
 
 function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [model, setModel] = useState("gpt-4o-mini");
+  const [isListening, setIsListening] = useState(false);
+  const [recognition, setRecognition] = useState(null);
 
-  // New method to send updated model to server
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window) {
+      const recognition = new window.webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setPrompt((current) => current + ' ' + transcript);
+        setIsListening(false);
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      setRecognition(recognition);
+    }
+  }, [setPrompt]);
+
+  const toggleListening = () => {
+    if (!recognition) return;
+    
+    if (isListening) {
+      recognition.stop();
+    } else {
+      recognition.start();
+      setIsListening(true);
+    }
+  };
+
   const handleModelChange = (e) => {
     const newModel = e.target.value;
     setModel(newModel);
@@ -51,13 +88,27 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
         cols="50"
         style={{ width: '100%' }}
       />
-      <button
-        onClick={handleGenerate}
-        disabled={loading}
-        style={{ marginTop: '8px', display: 'block', marginLeft: 'auto' }}
-      >
-        {loading ? "Generating..." : "Generate Content"}
-      </button>
+      <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+        <button
+          onClick={toggleListening}
+          style={{
+            padding: '6px 12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            color: isListening ? 'red' : 'inherit',
+          }}
+          title={isListening ? 'Stop listening' : 'Start voice input'}
+        >
+          🎤 {isListening ? 'Stop' : 'Voice Input'}
+        </button>
+        <button
+          onClick={handleGenerate}
+          disabled={loading}
+        >
+          {loading ? "Generating..." : "Generate Content"}
+        </button>
+      </div>
       {error && <p className="error">{error}</p>}
       <div style={{ marginTop: '20px', textAlign: 'left' }}>
         <label htmlFor="model-dropdown" style={{ marginRight: '8px' }}>Model</label>
