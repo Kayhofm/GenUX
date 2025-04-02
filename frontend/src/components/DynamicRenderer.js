@@ -300,7 +300,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
           margin: '10px 10px',
           objectFit: 'contain',
           backgroundColor: 'white',
-          border: (theme) => `2px solid ${theme.palette.primary.main}`,
+          border: (theme) => `2px solid ${theme.palette.primary.main}60`,  // 60 for 60% transparency
           borderRadius: '4px'
         }}
       />;
