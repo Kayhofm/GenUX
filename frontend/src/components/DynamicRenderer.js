@@ -288,6 +288,22 @@ function DynamicRenderer({ component, onContentGenerated }) {
           backgroundColor: 'white',
         }}
       />;
+    case "borderImage":
+      return <Box
+        component="img"
+        src={props.imageSrc || "/img/default-image.png"}
+        alt={props.content}
+        className={`${type} fade-in`}
+        sx={{ 
+          width: `calc(${width}px - 4px)`,  // Subtract 2px border from each side
+          height: `calc(${width}px - 4px)`, // Subtract 2px border from each side
+          margin: '10px 10px',
+          objectFit: 'contain',
+          backgroundColor: 'white',
+          border: (theme) => `2px solid ${theme.palette.primary.main}`,
+          borderRadius: '4px'
+        }}
+      />;
     case "textInput":
       const inputId = props.ID || props.id;
       return <TextField

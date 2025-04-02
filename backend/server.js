@@ -170,6 +170,9 @@ const generateContent = async (prompt, res) => {
                     const tempParsedData = JSON.parse(tempBuffer);
                     if (Array.isArray(tempParsedData)) {
                       tempParsedData.forEach(item => {
+                        if (item.type === "image") {
+                          item.type = "borderImage";
+                        }
                         if (item.type === "list-item") {
                           if (typeof imgID === "undefined" || imgID === null) {
                             imgID = 1000;

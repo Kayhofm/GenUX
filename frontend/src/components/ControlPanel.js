@@ -101,7 +101,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
           }}
           title={isListening ? 'Stop listening' : 'Start voice input'}
         >
-          🎤 {isListening ? 'Stop' : 'Voice Input'}
+          {isListening ? 'Stop' : 'Voice Input'}
         </button>
         <button
           onClick={handleGenerate}

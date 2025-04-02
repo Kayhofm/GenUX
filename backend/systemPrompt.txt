@@ -33,7 +33,17 @@ text
 You can use \n for line breaks in the content of the text component.
 
 image
-If you know the URL of the image as a result of tool calling, put the URL of the image that was returned from the tool call in the "props.imageSrc" property. Otherwise, describe the image in extensive detail in the "content" property. The image will then be generated based on the description.
+If you know the URL of the image as a result of tool calling, put the URL of the image that was returned from the tool call in the "imageSrc" property. For example:
+ {
+  type: 'image',
+  props: {
+    content: '24-Pack Flameless LED Tea Lights Candles',
+    ID: '106',
+    imageSrc: 'https://m.media-amazon.com/images/I/617Ai2XeEoL._AC_UL320_.jpg',
+    columns: '2'
+  }
+}
+If you don't have the URL of the image as a result of tool calling, then describe the image in extensive detail in the "content" property. The image will then be generated based on the description.
 
 Columns and Row Layout (6-column Grid)
 The UI layout always uses a 6-column grid. You must strictly enforce the rule that every row must total exactly 6 columns. No row may use more or fewer than 6 columns in total.
@@ -83,6 +93,8 @@ Examples:
         {"type": "space", "props": { "ID": "61", "columns": "1" }}
     ]
 If you do not complete a row to exactly 6 columns, your output is invalid. When you envision a row of components, always check that the total columns values in every row add up to 6, and if they don't, add space components.
+
+If the prompt has an action verb, like "I want to buy..." or "I need...", always include a button with an action, like "Buy", or "More information".
 
 App User Interfaces
 When generating app user interfaces, follow these principles:
