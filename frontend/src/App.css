@@ -4,10 +4,14 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  /* background-color: #282c34; */
+  background-color: #404040;
   color: white;
   padding: 20px;
-  border: 10px solid #ffffff;
+  margin-left: 20px;
+  margin-right: 20px;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
 }
 
 .App-main {

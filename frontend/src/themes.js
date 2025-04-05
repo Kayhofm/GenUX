@@ -4,13 +4,15 @@ export const defaultTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#3f51b5',
+      // main: '#3f51b5',
+      main: '#245f73',
       light: '#757de8',
       dark: '#002984',
       contrastText: '#fff'
     },
     secondary: {
-      main: '#f50057',
+      // main: '#f50057',
+      main: '#733e24',
       light: '#ff5983',
       dark: '#bb002f',
       contrastText: '#fff'
@@ -41,14 +43,26 @@ export const defaultTheme = createTheme({
     },
     background: {
       paper: '#fff',
-      default: '#fafafa'
+      // default: '#fafafa'
+      default: '#f2f0ef'
     },
     text: {
       primary: '#000',
       secondary: '#555'
     },
     divider: '#e0e0e0'
-  }
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          '&:hover': {
+            backgroundColor: 'rgba(36, 95, 115, 0.90)', // hover state layer (onPrimary @ 8%)
+          },
+        },
+      },
+    },
+  },
 });
 
 export const darkTheme = createTheme({
@@ -146,6 +160,33 @@ export const modernTheme = createTheme({
     },
     background: {
       default: '#ffffff',
+      paper: '#fafafa'
+    },
+    text: {
+      primary: '#212121',
+      secondary: '#757575'
+    },
+    divider: '#e0e0e0'
+  }
+});
+
+export const grayTheme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#4B4237',
+      light: '#EDE7D9',
+      dark: '#736B60',
+      contrastText: '#fff'
+    },
+    secondary: {
+      main: '#D5A021',
+      light: '#EDE7D9',
+      dark: '#A49694',
+      contrastText: '#000'
+    },
+    background: {
+      default: '#ede7d9',
       paper: '#fafafa'
     },
     text: {

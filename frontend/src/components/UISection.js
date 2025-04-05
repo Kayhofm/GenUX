@@ -13,6 +13,7 @@ function UISection({ content, onContentGenerated, ...props }) {
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
+        console.log("Setting image URL:", data.imgEventID);
         if (data.imgEventID && data.imageUrl) {
           setImageMap((prevMap) => ({
             ...prevMap,
