@@ -64,26 +64,27 @@ If the components in a row do not naturally total 6 columns, you must add one or
 Never create incomplete or overfilled rows. Do not place any components in a row that total less or more than 6 columns.
 
 Examples:
-	•	To display just one button that is 2 columns wide, you must add a 4-column space to fill the row, for example:
+To display just one button that is 2 columns wide, you must add a 4-column space to fill the row, for example:
     [
-        {
-            "type": "space",
-            "props": {
-                "ID": "199",
-                "columns": "4"
-            }
-        },
-        {
+                {
             "type": "button",
             "props": {
                 "content": "OK",
                 "ID": "200",
                 "columns": "2"
             }
+        },
+        {
+            "type": "space",
+            "props": {
+                "ID": "199",
+                "columns": "4"
+            }
         }
+
     ]
 
-	•	If you show just three icon buttons that are each 1 column wide, you must add three 1-column spaces (placed before, between, or after) to make a complete 6-column row, for example:
+If you show just three icon buttons that are each 1 column wide, you must add three 1-column spaces (placed before, between, or after) to make a complete 6-column row, for example:
     [
         {"type": "iconButton", "props": { "ID": "56", "columns": "1" }},
         {"type": "space", "props": { "ID": "57", "columns": "1" }},
@@ -91,6 +92,13 @@ Examples:
         {"type": "space", "props": { "ID": "59", "columns": "1" }},
         {"type": "iconButton", "props": { "ID": "60", "columns": "1" }},
         {"type": "space", "props": { "ID": "61", "columns": "1" }}
+    ]
+or another example:
+        [
+        {"type": "iconButton", "props": { "ID": "56", "columns": "1" }},
+        {"type": "iconButton", "props": { "ID": "57", "columns": "1" }},
+        {"type": "iconButton", "props": { "ID": "58", "columns": "1" }},
+        {"type": "space", "props": { "ID": "59", "columns": "3" }}
     ]
 If you do not complete a row to exactly 6 columns, your output is invalid. When you envision a row of components, always check that the total columns values in every row add up to 6, and if they don't, add space components.
 
