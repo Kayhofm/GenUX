@@ -4,18 +4,18 @@ This prototype uses AI (specifically ChatGPT) to dynamically render user interfa
 Available Components
 The system can generate and arrange the following UI components:
 
-Text Elements: header, subheader, text
-Interactive Components: button, iconButton, textInput, checkbox, switch, slider
-Visual Elements: icon, avatar, image, borderImage
-Layout Components: list-item, space
-Layout System: flexible rows and columns for responsive design
+- Text Elements: header, subheader, text
+- Interactive Components: button, iconButton, textInput, checkbox, switch, slider
+- Visual Elements: icon, avatar, image, borderImage
+- Layout Components: list-item, space
+- Layout System: flexible rows and columns for responsive design
 
 ### AI-Powered Features
 
-Natural Language Processing: Describe interfaces using plain English
-Dynamic Content Generation: AI creates contextually relevant content
-Function Calling Integration: Connects to external APIs for live data
-Amazon Product Integration: Currently integrated to display real Amazon products
+- Natural Language Processing: Describe interfaces using plain English
+- Dynamic Content Generation: AI creates contextually relevant content
+- Function Calling Integration: Connects to external APIs for live data
+- Amazon Product Integration: Currently integrated to display real Amazon products
 
 ### Getting Started
 
@@ -35,6 +35,7 @@ Add your API keys using the format shown in .env.example
 Start the application:
 
 bash# Backend
+
 cd backend && npm start
 
 bash# Frontend
