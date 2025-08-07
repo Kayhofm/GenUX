@@ -1,4 +1,5 @@
-##Generative UX
+## Generative UX
+
 This prototype uses AI (specifically ChatGPT) to dynamically render user interfaces based on natural language prompts. Users can describe what they want to see, and the AI generates functional UI components in real-time.
 Available Components
 The system can generate and arrange the following UI components:
@@ -9,14 +10,15 @@ Visual Elements: icon, avatar, image, borderImage
 Layout Components: list-item, space
 Layout System: flexible rows and columns for responsive design
 
-AI-Powered Features
+### AI-Powered Features
 
 Natural Language Processing: Describe interfaces using plain English
 Dynamic Content Generation: AI creates contextually relevant content
 Function Calling Integration: Connects to external APIs for live data
 Amazon Product Integration: Currently integrated to display real Amazon products
 
-Getting Started
+### Getting Started
+
 To run this prototype locally:
 
 Create accounts and obtain API keys for:
@@ -34,7 +36,7 @@ Start the application:
 bash# Backend
 cd backend && npm start
 
-# Frontend
+bash# Frontend
 
 cd frontend && npm start
 
