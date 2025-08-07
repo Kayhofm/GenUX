@@ -23,9 +23,9 @@ To run this prototype locally:
 
 Create accounts and obtain API keys for:
 
-OpenAI (for AI interface generation)
-FAL (for image generation capabilities)
-Oxylabs (for web scraping functionality)
+- OpenAI (for AI interface generation)
+- FAL (for image generation capabilities)
+- Oxylabs (for web scraping functionality)
 
 Set up environment variables:
 
@@ -33,6 +33,7 @@ Create a .env file in the /backend directory
 Add your API keys using the format shown in .env.example
 
 Start the application:
+
 bash# Backend
 cd backend && npm start
 
