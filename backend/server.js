@@ -1,14 +1,24 @@
+import dotenv from "dotenv";
+dotenv.config(); // Load environment variables
+
+// Debug environment loading
+console.log('=== ENVIRONMENT DEBUG ===');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('OPENAI_API_KEY exists:', !!process.env.OPENAI_API_KEY);
+console.log('OPENAI_API_KEY length:', process.env.OPENAI_API_KEY?.length);
+console.log('OPENAI_API_KEY first 10 chars:', process.env.OPENAI_API_KEY?.substring(0, 10));
+console.log('========================');
+
 import express from "express";
 import cors from "cors";
 import { OpenAI } from "openai";
 import prompts from "./prompts.json" with { type: "json" };
 import { generateImage, generateImageDalle, getImageStore, imageEventEmitter } from "./imageCreator.js";
-import dotenv from "dotenv";
 import toolDefinition from "./toolDefinition.json" with { type: "json" };
 import { getAmazonProducts } from "./toolAmazon.js";
-dotenv.config(); // Load environment variables
 
 const openai = new OpenAI({
+  // apiKey: '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'
   apiKey: process.env.OPENAI_API_KEY,
 });
 
