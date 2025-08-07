@@ -18,7 +18,6 @@ import toolDefinition from "./toolDefinition.json" with { type: "json" };
 import { getAmazonProducts } from "./toolAmazon.js";
 
 const openai = new OpenAI({
-  // apiKey: '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'
   apiKey: process.env.OPENAI_API_KEY,
 });
 
