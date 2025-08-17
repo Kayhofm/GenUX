@@ -1,9 +1,9 @@
 // import dotenv from "dotenv";
 // dotenv.config(); // Load environment variables
 
-if (process.env.NODE_ENV !== 'production') {
-  import('dotenv').then(dotenv => dotenv.config());
-}
+// if (process.env.NODE_ENV !== 'production') {
+//   import('dotenv').then(dotenv => dotenv.config());
+// }
 
 // Debug environment loading
 console.log('=== ENVIRONMENT DEBUG ===');
