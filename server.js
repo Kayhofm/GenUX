@@ -49,8 +49,8 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:3000',                    // Development
-    'https://your-vercel-app.vercel.app',       // Replace with your actual Vercel URL
-    'https://your-custom-domain.com'            // If you have a custom domain
+    'https://gen-ux-seven.vercel.app/',         // Vercel URL
+    'https://your-custom-domain.com'            // custom domain
   ],
   credentials: true
 }));
