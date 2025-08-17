@@ -1,14 +1,5 @@
 import dotenv from "dotenv";
-import path from "path";
-
-// Fix the dotenv path for Railway deployment
-if (process.env.NODE_ENV === 'production') {
-  // In production (Railway), don't use .env file - use Railway environment variables directly
-  console.log('Production mode: Using Railway environment variables');
-} else {
-  // In development, load from .env file
-  dotenv.config({ path: path.resolve(process.cwd(), '.env') });
-}
+dotenv.config(); // Load environment variables
 
 // Debug environment loading
 console.log('=== ENVIRONMENT DEBUG ===');
@@ -16,8 +7,6 @@ console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('OPENAI_API_KEY exists:', !!process.env.OPENAI_API_KEY);
 console.log('OPENAI_API_KEY length:', process.env.OPENAI_API_KEY?.length);
 console.log('OPENAI_API_KEY first 10 chars:', process.env.OPENAI_API_KEY?.substring(0, 10));
-console.log('Current working directory:', process.cwd());
-console.log('All environment variables with OPENAI:', Object.keys(process.env).filter(key => key.includes('OPENAI')));
 console.log('========================');
 
 import express from "express";
