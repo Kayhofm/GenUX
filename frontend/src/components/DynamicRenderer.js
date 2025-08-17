@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Typography, Button, Fab, Box, TextField, Avatar, ListItem, ListItemAvatar, ListItemText, IconButton, CardMedia, Slider, Checkbox, Switch, List } from '@mui/material';
 import * as Icons from '@mui/icons-material';
 import { useFormContext } from '../context/FormContext';
+import API_CONFIG from '../config/api';
 
 function DynamicRenderer({ component, onContentGenerated }) {
   const [loading, setLoading] = useState(false);
@@ -39,7 +40,8 @@ function DynamicRenderer({ component, onContentGenerated }) {
       // Reset content before fetching new data
       onContentGenerated([]);
 
-      fetch("http://localhost:4000/api/button-click", {
+      // fetch("http://localhost:4000/api/button-click", {
+      fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BUTTON_CLICK}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -112,7 +114,8 @@ function DynamicRenderer({ component, onContentGenerated }) {
       // Reset content before fetching new data
       onContentGenerated([]);
 
-      fetch("http://localhost:4000/api/button-click", {
+      // fetch("http://localhost:4000/api/button-click", {
+      fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BUTTON_CLICK}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
