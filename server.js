@@ -40,6 +40,7 @@ if (process.env.OPENAI_API_KEY) {
   process.exit(1);
 }
 
+
 const tools = toolDefinition;
 
 const app = express();
