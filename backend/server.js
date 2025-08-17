@@ -12,9 +12,13 @@ console.log('========================');
 import express from "express";
 import cors from "cors";
 import { OpenAI } from "openai";
-import prompts from "./prompts.json" with { type: "json" };
+import fs from 'fs';
+
+// Fixed JSON imports - read files instead of using import with syntax
+const prompts = JSON.parse(fs.readFileSync('./prompts.json', 'utf8'));
+const toolDefinition = JSON.parse(fs.readFileSync('./toolDefinition.json', 'utf8'));
+
 import { generateImage, generateImageDalle, getImageStore, imageEventEmitter } from "./imageCreator.js";
-import toolDefinition from "./toolDefinition.json" with { type: "json" };
 import { getAmazonProducts } from "./toolAmazon.js";
 
 const openai = new OpenAI({
@@ -24,15 +28,19 @@ const openai = new OpenAI({
 const tools = toolDefinition;
 
 const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(
-  cors({
-    origin: "http://localhost:3000", // Allow requests from React app
-  })
-);
 
-import fs from 'fs';
+// Updated CORS configuration for production
+app.use(cors({
+  origin: [
+    'http://localhost:3000',                    // Development
+    'https://your-vercel-app.vercel.app',       // Replace with your actual Vercel URL
+    'https://your-custom-domain.com'            // If you have a custom domain
+  ],
+  credentials: true
+}));
+
+app.use(express.json());
+
 const systemPrompt01 = fs.readFileSync('systemPrompt.txt', 'utf8');
 const userPrompt01 = prompts.userPrompt01;
 let sessionMessages = {}; // Store messages keyed by session ID or user ID
@@ -404,7 +412,8 @@ app.post("/api/set-model", (req, res) => {
   res.status(200).json({ message: "Model updated", model: currentModel });
 });
 
-const PORT = 4000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Updated port configuration for Railway
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
 });
