@@ -13,6 +13,8 @@ console.log('OPENAI_API_KEY length:', process.env.OPENAI_API_KEY?.length);
 console.log('OPENAI_API_KEY first 10 chars:', process.env.OPENAI_API_KEY?.substring(0, 10));
 console.log('========================');
 
+console.log('🔍 ENV KEYS:', Object.keys(process.env));
+
 import express from "express";
 import cors from "cors";
 import { OpenAI } from "openai";
