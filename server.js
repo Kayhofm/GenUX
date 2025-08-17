@@ -25,9 +25,18 @@ const toolDefinition = JSON.parse(fs.readFileSync('./toolDefinition.json', 'utf8
 import { generateImage, generateImageDalle, getImageStore, imageEventEmitter } from "./imageCreator.js";
 import { getAmazonProducts } from "./toolAmazon.js";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI_API_KEY,
+// });
+
+let openai;
+
+if (process.env.OPENAI_API_KEY) {
+  openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+} else {
+  console.error("❌ OPENAI_API_KEY is missing from environment variables");
+  process.exit(1);
+}
 
 const tools = toolDefinition;
 
