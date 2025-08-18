@@ -8,7 +8,8 @@ function UISection({ content, onContentGenerated, ...props }) {
   const theme = useTheme();
 
   useEffect(() => {
-    const eventSource = new EventSource("http://localhost:4000/api/images/stream");
+    // const eventSource = new EventSource("http://localhost:4000/api/images/stream");
+    const eventSource = new EventSource(`${API_CONFIG.BASE_URL}/api/images/stream`);
 
     eventSource.onmessage = (event) => {
       try {

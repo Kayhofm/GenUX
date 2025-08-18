@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { streamOpenAIContent } from "../services/openaiService";
+import API_CONFIG from '../config/api';
 
 function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
   const [loading, setLoading] = useState(false);
@@ -48,7 +49,8 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
   const handleModelChange = (e) => {
     const newModel = e.target.value;
     setModel(newModel);
-    fetch("http://localhost:4000/api/set-model", {
+    // fetch("http://localhost:4000/api/set-model", {
+    fetch(`${API_CONFIG.BASE_URL}/api/set-model`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ model: newModel })
