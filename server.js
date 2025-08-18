@@ -45,12 +45,12 @@ const tools = toolDefinition;
 
 const app = express();
 
-// Updated CORS configuration for production
+// CORS configuration for production
 app.use(cors({
   origin: [
     'http://localhost:3000',                    // Development
-    'https://gen-ux-seven.vercel.app/',         // Vercel URL
-    'https://your-custom-domain.com'            // custom domain
+    'https://gen-ux-seven.vercel.app',          // Vercel URL
+    'https://genux-production.up.railway.app'   // Allow Railway URL for testing
   ],
   credentials: true
 }));
