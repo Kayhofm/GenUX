@@ -19,7 +19,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
   };
 
   const handleClick = () => {
-    if (component.type === "button") {
+    if (["button", "iconButton", "icon"].includes(component.type)) {
       const currentFormValues = getFormValues();
       console.log('Form values at click:', currentFormValues);
       
