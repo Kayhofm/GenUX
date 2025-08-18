@@ -32,8 +32,12 @@ function DynamicRenderer({ component, onContentGenerated }) {
       console.log('Form description:', formDescription);
       setLoading(true);
 
-      // Only include form values in prompt if they exist
-      const buttonPrompt = `The user clicked the button that says: "${component.props.content}"${
+      // Creation of prompt based on button click
+      const label = component.type === "iconButton" || component.type === "icon"
+        ? `the ${component.props.content} icon`
+        : `the button that says: "${component.props.content}"`;
+
+      const buttonPrompt = `The user clicked ${label}${
         formDescription ? `. Form values are: ${formDescription}` : ''
       }. Generate a new UI based on this input.`;
 
