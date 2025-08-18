@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import DynamicRenderer from "./DynamicRenderer";
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import API_CONFIG from '../config/api';
 
 function UISection({ content, onContentGenerated, ...props }) {
   const [imageMap, setImageMap] = useState({}); // Store matched image URLs
