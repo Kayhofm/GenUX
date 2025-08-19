@@ -136,7 +136,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
           placeholder="Bypass key"
           value={bypassKey}
           onChange={(e) => setBypassKey(e.target.value)}
-          style={{ marginTop: '8px', padding: '4px', width: '100%' }}
+          style={{ marginTop: '8px', padding: '4px', width: '20%' }}
         />
       </div>
     </div>

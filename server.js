@@ -31,6 +31,7 @@ if (process.env.OPENAI_API_KEY) {
   process.exit(1);
 }
 
+const bypassKey = process.env.BYPASS_KEY;
 const tools = toolDefinition;
 
 const app = express();
