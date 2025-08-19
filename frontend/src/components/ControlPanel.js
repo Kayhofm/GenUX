@@ -120,7 +120,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
           <option value="gpt-4o-mini">gpt-4o-mini</option>
           <option value="gpt-4.1-mini">gpt-4.1-mini</option>
           <option value="gpt-5-mini">gpt-5-mini</option>
-          <option value="gpt-5-nano">gpt-5</option>
+          <option value="gpt-5-nano">gpt-5-nano</option>
         </select>
       </div>
     </div>

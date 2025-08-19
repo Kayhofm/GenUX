@@ -9,6 +9,7 @@ import express from "express";
 import cors from "cors";
 import { OpenAI } from "openai";
 import fs from 'fs';
+import rateLimit from 'express-rate-limit';
 
 // Fixed JSON imports - read files instead of using import with syntax
 const prompts = JSON.parse(fs.readFileSync('./prompts.json', 'utf8'));
@@ -45,6 +46,14 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 3, // limit each IP to 20 requests per windowMs
+  message: {
+    error: 'Too many requests from this IP. Please try again later.'
+  }
+});
 
 const systemPrompt01 = fs.readFileSync('systemPrompt.txt', 'utf8');
 const userPrompt01 = prompts.userPrompt01;
@@ -324,6 +333,10 @@ const generateContent = async (prompt, res) => {
   }
 // });
 };
+
+// Rate limit API calls
+app.use("/api/generate", limiter);
+app.use("/api/button-click", limiter);
 
 app.get("/api/generate", async (req, res) => {
   const prompt = req.query.prompt;
