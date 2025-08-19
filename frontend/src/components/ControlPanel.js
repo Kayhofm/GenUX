@@ -116,11 +116,11 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
       <div style={{ marginTop: '20px', textAlign: 'left' }}>
         <label htmlFor="model-dropdown" style={{ marginRight: '8px' }}>Model</label>
         <select id="model-dropdown" value={model} onChange={handleModelChange}>
-          <option value="gpt-4o">gpt-4o</option>
+          <option value="gpt-4.1">gpt-4.1</option>
           <option value="gpt-4o-mini">gpt-4o-mini</option>
           <option value="gpt-4.1-mini">gpt-4.1-mini</option>
           <option value="gpt-5-mini">gpt-5-mini</option>
-          <option value="gpt-5">gpt-5</option>
+          <option value="gpt-5-nano">gpt-5</option>
         </select>
       </div>
     </div>
