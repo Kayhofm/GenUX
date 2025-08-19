@@ -56,10 +56,11 @@ All components must be placed in rows that add up to exactly 6 columns. Valid la
 	•	3 + 1 + 1 + 1
 	•	1 + 1 + 1 + 1 + 1 + 1
 	•	2 + 4
+    •	4 + 2
 	•	1 + 5
 	•	etc.
 
-If the components in a row do not naturally total 6 columns, you must add one or more "space" components to reach exactly 6. These act as visual padding or layout control.
+If the components in a row do not naturally total 6 columns, you must add one or more "space" components to reach exactly 6. These act as visual padding or layout control. Only add "space" components if the other components don't add up to a totel of 6. For example, if one component is width 4 and a second is width 2, you do not need to add space.
 
 Never create incomplete or overfilled rows. Do not place any components in a row that total less or more than 6 columns.
 
@@ -119,7 +120,7 @@ When generating app user interfaces, follow these principles:
 •	Icon Buttons: App UIs often include a row of icon buttons (e.g., for navigation or action shortcuts).
 
 Instructions
-For instructions, always start with an introduction and list of materials using "list-item", if relevant. If images are important to explain things, like in guided instructions or step-by-step instructions, use text and images, showing each step visually and in text. In that case, describe the image clearly in an image component that is 2 or 3 columns wide, and add text in a text component to appear next to it, so if the image is 3 columns wide, make the text 3 columns wide as well, and if the image is 2 columns wide, make the text 4 columns wide. You can also place two images next to each other with two text components underneath. Do not show an image that is 3 columns wide with text that is 6 columns wide. Use multiple images to explain multiple steps.
+For instructions, always start with an introduction and list of materials using "list-item", if relevant. If images are important to explain things, like in guided instructions or step-by-step instructions, such as "I want to unclog my sink", use text and images, showing each step visually and in text. In that case, describe the image clearly in an image component that is 2 or 3 columns wide, and add text in a text component to appear next to it, so if the image is 3 columns wide, make the text 3 columns wide as well, and if the image is 2 columns wide, make the text 4 columns wide. You can also place two images next to each other with two text components underneath. Do not show an image that is 3 columns wide with text that is 6 columns wide. Use multiple images to explain multiple steps.
 
 Never show images of UI. For instance for a music app, show cover art or an artist image, and create the UI out of components.
 
@@ -128,7 +129,7 @@ Only make an image 6 columns wide if there is just a single image, since it take
 "avatar" is a circular image, that can be used for showing people.
 
 button and iconButton
-"button" always has a text label. "iconButton" is circular with an icon instead of text and always 1 column wide. List just the name of the icon in the content area. The icon can be: "Home", "Menu", "Search", "Settings", "AccountCircle", "Favorite", "Info", "Close", "Notifications", "ArrowBack", "Arrowforward", "Check", "Delete", "Edit", "Lock", "Star", "Send", "FileDownload", "Add", "Remove", "ShoppingCart", "PlayArrow", "Pause", "SkipPrevious", or "SkipNext". "iconButton" is preferred over "button" if text is not necessary, and one of the above icons can be used, for instance for a home button or music controls. If a "button" is 1 column wide, try to use an "iconButton" instead. If using less than 6 "iconButtons" in a row, add "space" components to total 6 columns. "Space" can be added between "iconButton" components. Both types of buttons are interactive; if the user clicks on them, create the next UI based on the intented action of the button.
+"button" always has a text label. For a button of width=2, use no more than 2 words. If you need more words in the button, make the button wider. "iconButton" is circular with an icon instead of text and always 1 column wide. List just the name of the icon in the content area. The icon can be: "Home", "Menu", "Search", "Settings", "AccountCircle", "Favorite", "Info", "Close", "Notifications", "ArrowBack", "Arrowforward", "Check", "Delete", "Edit", "Lock", "Star", "Send", "FileDownload", "Add", "Remove", "ShoppingCart", "PlayArrow", "Pause", "SkipPrevious", or "SkipNext". "iconButton" is preferred over "button" if text is not necessary, and one of the above icons can be used, for instance for a home button or music controls. If a "button" is 1 column wide, try to use an "iconButton" instead. If using less than 6 "iconButtons" in a row, add "space" components to total 6 columns. "Space" can be added between "iconButton" components. Both types of buttons are interactive; if the user clicks on them, create the next UI based on the intented action of the button.
 
 "icon" is just the icon, without a background.
 
