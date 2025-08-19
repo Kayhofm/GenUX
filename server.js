@@ -338,6 +338,17 @@ const generateContent = async (prompt, res) => {
 app.use("/api/generate", limiter);
 app.use("/api/button-click", limiter);
 
+// HEAD pre-check route for /api/generate (used for rate limit detection)
+app.head("/api/generate", (req, res) => {
+  const prompt = req.query.prompt;
+  if (!prompt) {
+    return res.status(400).end();
+  }
+
+  // Return only headers to allow client-side pre-checks
+  res.status(200).end();
+});
+
 app.get("/api/generate", async (req, res) => {
   const prompt = req.query.prompt;
   if (!prompt) {
