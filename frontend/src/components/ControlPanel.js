@@ -127,7 +127,8 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
 
       {/* Intro message */}
       <div style={{ marginTop: '12px', color: '#555', textAlign: 'left'  }}>
-        This is an interactive AI demo that generates real-time user interfaces based on your prompt or actions.
+        This is an interactive AI demo that generates real-time user interfaces based on your prompt or actions.<br />
+        Try out these prompts: "I want to cook lasagna" or "I need to unclog my sink".
       </div>
 
       {/* Model dropdown */}
