@@ -5,16 +5,6 @@ if (process.env.NODE_ENV !== 'production') {
   import('dotenv').then(dotenv => dotenv.config());
 }
 
-// Debug environment loading
-console.log('=== ENVIRONMENT DEBUG ===');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('OPENAI_API_KEY exists:', !!process.env.OPENAI_API_KEY);
-console.log('OPENAI_API_KEY length:', process.env.OPENAI_API_KEY?.length);
-console.log('OPENAI_API_KEY first 10 chars:', process.env.OPENAI_API_KEY?.substring(0, 10));
-console.log('========================');
-
-console.log('🔍 ENV KEYS:', Object.keys(process.env));
-
 import express from "express";
 import cors from "cors";
 import { OpenAI } from "openai";
@@ -39,7 +29,6 @@ if (process.env.OPENAI_API_KEY) {
   console.error("❌ OPENAI_API_KEY is missing from environment variables");
   process.exit(1);
 }
-
 
 const tools = toolDefinition;
 
@@ -323,7 +312,7 @@ const generateContent = async (prompt, res) => {
     sessionMessages[sessionId+1] = "\nUser prompt: " + prompt + "\nAssistant response:\n" + fullMessage;
 
   } catch (error) {
-    console.error("Streaming Error:", error.response?.data || error.message);
+    console.error("Streaming Error:", error.response?.status, error.response?.data || error.message);
     res.status(500).json({ error: "Failed to generate content." });
   }
 // });
