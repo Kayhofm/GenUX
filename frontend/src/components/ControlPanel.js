@@ -126,18 +126,17 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
       {error && <p className="error" style={{ marginTop: '12px', color: 'red' }}>{error}</p>}
 
       {/* Intro message */}
-      <div style={{ marginTop: '12px', color: '#555', textAlign: 'left'  }}>
-        This is an interactive AI demo that generates real-time user interfaces based on your prompt or actions.<br />
-        Try out these prompts: "I want to cook lasagna" or "I need to unclog my sink".
+      <div style={{ marginTop: '20px', color: '#555', textAlign: 'left'  }}>
+        This is an interactive AI demo that generates real-time user interfaces based on your prompt or actions.<br /><br />
+        To start, try out these prompts: "I want to cook lasagna" or "I need to unclog my sink".
       </div>
 
       {/* Model dropdown */}
       <div style={{ marginTop: '20px', textAlign: 'left' }}>
         <label htmlFor="model-dropdown" style={{ marginRight: '8px' }}>Model</label>
         <select id="model-dropdown" value={model} onChange={handleModelChange}>
-          <option value="gpt-4.1">gpt-4.1</option>
-          <option value="gpt-4o-mini">gpt-4o-mini</option>
-          <option value="gpt-4.1-mini">gpt-4.1-mini</option>
+          <option value="gpt-4o">gpt-4o</option>
+          <option value="gpt-4o-mini">gpt-4o-mini (fastest)</option>
           <option value="gpt-5-mini">gpt-5-mini</option>
           <option value="gpt-5-nano">gpt-5-nano</option>
         </select>
