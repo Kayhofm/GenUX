@@ -49,13 +49,13 @@ app.use(cors({
 app.use(express.json());
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
+  windowMs: 24 * 60 * 60 * 1000, // 24 hours
+  max: 25, // Limit each IP to 25 requests per windowMs
   message: {
     error: 'Too many requests from this IP. Please try again later.'
   },
   skip: (req, res) => {
-    return req.query.bypass === 'dev';
+    return req.query.bypass === process.env.BYPASS_KEY;
   }
 });
 

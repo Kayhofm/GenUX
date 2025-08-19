@@ -130,7 +130,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
           <option value="gpt-5-nano">gpt-5-nano</option>
         </select>
       </div>
-      <div>
+      <div style={{ marginTop: '20px', textAlign: 'left' }}>
         <input
           type="password"
           placeholder="Bypass key"
