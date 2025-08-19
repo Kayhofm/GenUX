@@ -98,16 +98,6 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
         cols="50"
         style={{ width: '100%' }}
       />
-      
-      {/* Rationale placeholder */}
-      <div style={{ marginTop: '12px', fontStyle: 'italic' }}>
-        <strong>Rationale:</strong> -
-      </div>
-
-      {/* Intro message */}
-      <div style={{ marginTop: '12px', color: '#555' }}>
-        This is an interactive AI demo that generates real-time user interfaces based on your prompt or actions.
-      </div>
 
       {/* Buttons */}
       <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
@@ -135,6 +125,11 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
       {/* Error display */}
       {error && <p className="error" style={{ marginTop: '12px', color: 'red' }}>{error}</p>}
 
+      {/* Intro message */}
+      <div style={{ marginTop: '12px', color: '#555', textAlign: 'left'  }}>
+        This is an interactive AI demo that generates real-time user interfaces based on your prompt or actions.
+      </div>
+
       {/* Model dropdown */}
       <div style={{ marginTop: '20px', textAlign: 'left' }}>
         <label htmlFor="model-dropdown" style={{ marginRight: '8px' }}>Model</label>
@@ -151,10 +146,10 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
       <div style={{ marginTop: '20px', textAlign: 'left' }}>
         <input
           type="password"
-          placeholder="Bypass key"
+          placeholder="-"
           value={bypassKey}
           onChange={(e) => setBypassKey(e.target.value)}
-          style={{ padding: '4px', width: '200px' }}
+          style={{ padding: '4px', width: '140px' }}
         />
       </div>
     </div>
