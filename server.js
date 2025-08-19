@@ -48,10 +48,13 @@ app.use(cors({
 app.use(express.json());
 
 const limiter = rateLimit({
-  windowMs: 30 * 60 * 1000, // 30 minutes
-  max: 20, // limit each IP to 20 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 20,
   message: {
     error: 'Too many requests from this IP. Please try again later.'
+  },
+  skip: (req, res) => {
+    return req.query.bypass === 'dev';
   }
 });
 

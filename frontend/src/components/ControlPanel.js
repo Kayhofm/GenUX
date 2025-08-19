@@ -8,6 +8,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
   const [model, setModel] = useState("gpt-4o-mini");
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
+  const [bypassKey, setBypassKey] = useState('');
 
   useEffect(() => {
     if ('webkitSpeechRecognition' in window) {
@@ -67,7 +68,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
 
     streamOpenAIContent(prompt, (data) => {
       onContentGenerated((prev) => [...prev, data]); // Append received components
-    })
+    }, bypassKey)
       .catch((err) => {
         if (err.code === 429) {
           setError("You've hit the request limit. Please wait a few minutes and try again.");
@@ -128,6 +129,15 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
           <option value="gpt-5-mini">gpt-5-mini</option>
           <option value="gpt-5-nano">gpt-5-nano</option>
         </select>
+      </div>
+      <div>
+        <input
+          type="password"
+          placeholder="Bypass key"
+          value={bypassKey}
+          onChange={(e) => setBypassKey(e.target.value)}
+          style={{ marginTop: '8px', padding: '4px', width: '100%' }}
+        />
       </div>
     </div>
   );
