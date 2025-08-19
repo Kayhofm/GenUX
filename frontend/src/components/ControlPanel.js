@@ -69,9 +69,9 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
       onContentGenerated((prev) => [...prev, data]); // Append received components
     })
       .catch((err) => {
-        if (err?.response?.status === 429) {
+        if (err.code === 429) {
           setError("You've hit the request limit. Please wait a few minutes and try again.");
-        } else if (err?.response?.status === 500) {
+        } else if (err.code >= 500) {
           setError("Server error. Please try again later.");
         } else {
           setError("Failed to generate content. Please try again.");
