@@ -119,8 +119,8 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
           <option value="gpt-4o">gpt-4o</option>
           <option value="gpt-4o-mini">gpt-4o-mini</option>
           <option value="gpt-4-turbo">gpt-4-turbo</option>
-          <option value="GPT-5-mini">GPT-5-mini</option>
-          <option value="GPT-5">GPT-5</option>
+          <option value="gpt-5-mini">gpt-5-mini</option>
+          <option value="gpt-5">gpt-5</option>
         </select>
       </div>
     </div>

@@ -85,6 +85,8 @@ const generateContent = async (prompt, res) => {
       .map(id => sessionMessages[id] || "") // Map to message content
       .join(""); // Concatenate all messages
 
+    console.log("▶ Calling OpenAI with model:", currentModel);
+
     const response = await openai.chat.completions.create({
       model: currentModel,
       messages: [
@@ -102,6 +104,8 @@ const generateContent = async (prompt, res) => {
       // frequency_penalty: -1, // -2 to +2, Decreases the likelihood of repeating phrases
       stream: true,
     });
+
+    console.log("✅ OpenAI responded, starting stream...");
 
     let buffer = ""; // Accumulate fragments of JSON
     let fullMessage = "";
