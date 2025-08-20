@@ -4,7 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { defaultTheme, darkTheme, natureTheme, modernTheme } from './themes';
 import { FormProvider } from './context/FormContext';
 import { Box, Typography } from '@mui/material';
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics, track } from "@vercel/analytics/react"
 
 const ControlPanel = React.lazy(() => import('./components/ControlPanel'));
 const UISection = React.lazy(() => import('./components/UISection'));
@@ -34,6 +34,12 @@ function App() {
   // Handle content generation from ControlPanel
   const handleContentGenerated = useCallback((newContent) => {
     setContent(newContent);
+
+    // Custom event for analytics
+    track('ui_generated', {
+      componentCount: newContent.length,
+      theme: newContent[0]?.theme || 'default',
+    });
   }, []);
 
   return (
