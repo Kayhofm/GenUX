@@ -3,7 +3,6 @@ import DynamicRenderer from "./DynamicRenderer";
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import API_CONFIG from '../config/api';
-import { Analytics } from "@vercel/analytics/react"
 
 function UISection({ content, onContentGenerated, ...props }) {
   const [imageMap, setImageMap] = useState({}); // Store matched image URLs
@@ -66,7 +65,6 @@ function UISection({ content, onContentGenerated, ...props }) {
             onContentGenerated={onContentGenerated}
           />
       ))}
-      <Analytics/>
     </Box>
   );
 }
