@@ -4,6 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { defaultTheme, darkTheme, natureTheme, modernTheme } from './themes';
 import { FormProvider } from './context/FormContext';
 import { Box, Typography } from '@mui/material';
+import { Analytics } from "@vercel/analytics/react"
 
 const ControlPanel = React.lazy(() => import('./components/ControlPanel'));
 const UISection = React.lazy(() => import('./components/UISection'));
@@ -81,6 +82,7 @@ function App() {
           </main>
         </div>
       </ThemeProvider>
+      <Analytics/>
     </FormProvider>
   );
 }
