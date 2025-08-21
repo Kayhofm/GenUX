@@ -118,7 +118,8 @@ const generateContent = async (prompt, res) => {
           model: currentModel,
           max_tokens: 1024,
           messages: [
-            { role: "user", content: userPrompt01 + prompt },
+            {  role: "system", content: systemPrompt01, 
+               role: "user", content: userPrompt01 + prompt },
           ],
         });
         console.log("🟢 Claude stream opened");
@@ -129,7 +130,7 @@ const generateContent = async (prompt, res) => {
         for await (const message of stream) {
           const delta = message.delta?.text;
           console.log("📨 Claude chunk:", delta); // debug here
-          
+
           if (delta) {
             buffer += delta;
             fullMessage += delta;
