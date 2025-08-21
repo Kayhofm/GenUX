@@ -109,6 +109,7 @@ const generateContent = async (prompt, res) => {
 
     if (currentModel.startsWith("claude")) {
       try {
+        console.log("🟣 Claude block triggered");
         res.setHeader("Content-Type", "text/event-stream");
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Connection", "keep-alive");
@@ -120,12 +121,15 @@ const generateContent = async (prompt, res) => {
             { role: "user", content: userPrompt01 + prompt },
           ],
         });
+        console.log("🟢 Claude stream opened");
 
         let buffer = "";
         let fullMessage = "";
 
         for await (const message of stream) {
           const delta = message.delta?.text;
+          console.log("📨 Claude chunk:", delta); // debug here
+          
           if (delta) {
             buffer += delta;
             fullMessage += delta;
