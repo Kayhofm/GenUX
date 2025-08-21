@@ -8,6 +8,7 @@
     "dev": "node server.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.60.0",
     "@fal-ai/client": "^1.2.0",
     "axios": "^1.11.0",
     "cors": "^2.8.5",

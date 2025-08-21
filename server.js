@@ -8,6 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
 import express from "express";
 import cors from "cors";
 import { OpenAI } from "openai";
+import Anthropic from '@anthropic-ai/sdk';
 import fs from 'fs';
 import rateLimit from 'express-rate-limit';
 
@@ -31,6 +32,10 @@ if (process.env.OPENAI_API_KEY) {
   console.error("❌ OPENAI_API_KEY is missing from environment variables");
   process.exit(1);
 }
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
 
 const bypassKey = process.env.BYPASS_KEY;
 const tools = toolDefinition;
@@ -65,7 +70,7 @@ const systemPrompt01 = fs.readFileSync('systemPrompt.txt', 'utf8');
 const userPrompt01 = prompts.userPrompt01;
 let sessionMessages = {}; // Store messages keyed by session ID or user ID
 if(!sessionMessages[999]) sessionMessages[999] = 0;
-let imgID;
+let imgID = 1000;
 
 // Global variable for model
 let currentModel = "gpt-4o-mini";
@@ -101,6 +106,34 @@ const generateContent = async (prompt, res) => {
       .join(""); // Concatenate all messages
 
     console.log("▶ Calling OpenAI with model:", currentModel);
+
+    // CLAUDE integration block
+    if (currentModel.startsWith("claude")) {
+      try {
+        const stream = await anthropic.messages.stream({
+          model: currentModel,
+          max_tokens: 1024,
+          messages: [
+            { role: "user", content: userPrompt01 + prompt },
+          ],
+        });
+
+        for await (const message of stream) {
+          const delta = message.delta?.text;
+          if (delta) {
+            res.write(`data: ${JSON.stringify({ type: "text", props: { content: delta } })}\n\n`);
+          }
+        }
+
+        res.write("data: [DONE]\n\n");
+        res.end();
+        return; // ⬅️ Prevent continuing into OpenAI logic
+      } catch (err) {
+        console.error("Claude streaming error:", err);
+        res.status(500).json({ error: "Claude failed to respond." });
+        return;
+      }
+    }
 
     const response = await openai.chat.completions.create({
       model: currentModel,

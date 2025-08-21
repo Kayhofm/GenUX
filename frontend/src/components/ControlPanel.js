@@ -139,6 +139,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
           <option value="gpt-4o-mini">gpt-4o-mini (fastest)</option>
           <option value="gpt-5-mini">gpt-5-mini</option>
           <option value="gpt-5-nano">gpt-5-nano</option>
+          <option value="claude-3-5-haiku-20241022">Claude Haiku 3.5</option>
         </select>
       </div>
 
