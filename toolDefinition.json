@@ -16,7 +16,7 @@
             "description": "City or neighborhood to search in, e.g. 'Seattle' or 'Capitol Hill'"
           }
         },
-        "required": ["query"],
+        "required": ["query", "location"],
         "additionalProperties": false
       },
       "strict": true

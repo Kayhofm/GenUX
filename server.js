@@ -36,6 +36,7 @@ const bypassKey = process.env.BYPASS_KEY;
 const tools = toolDefinition;
 
 const app = express();
+app.set('trust proxy', 1);
 
 // CORS configuration for production
 app.use(cors({
