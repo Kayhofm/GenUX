@@ -150,6 +150,7 @@ const generateContent = async (prompt, res) => {
                 parsed.forEach((item) => {
 
                       // image augmentation logic
+                      /*
                       if (item.type === "image") {
                         item.type = "borderImage";
                       }
@@ -170,6 +171,29 @@ const generateContent = async (prompt, res) => {
                           console.error("Error generating image:", error.message);
                           item.props.imageSrc = "/img/default-image.png";
                         }
+                      }
+                        */
+
+                      if (item.type === "image" || item.type === "borderImage" || item.type === "list-item") {
+                        if (typeof imgID === "undefined" || imgID === null) {
+                          imgID = 1000;
+                        } else {
+                          imgID++;
+                        }
+
+                        item.props.imageID = imgID;
+                        item.props.imageSrc = "";
+
+                        try {
+                          const imageUrl = generateImage(imgID, item.props.columns, item.props.content || "a broken image");
+                          item.props.imageSrc = imageUrl;
+                        } catch (error) {
+                          console.error("Error generating image:", error.message);
+                          item.props.imageSrc = "/img/default-image.png"; // fallback
+                        }
+
+                        // Optionally set style
+                        // item.type = "borderImage";  // ← optional, since you now support both
                       }
 
                   res.write(`data: ${JSON.stringify(item)}\n\n`);
