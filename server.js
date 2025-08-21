@@ -165,6 +165,7 @@ const generateContent = async (prompt, res) => {
 
                         try {
                           const imageUrl = generateImage(imgID, item.props.columns, item.props.content || "a broken image");
+                          item.props.imageSrc = imageUrl; // Set the image URL
                         } catch (error) {
                           console.error("Error generating image:", error.message);
                           item.props.imageSrc = "/img/default-image.png";
