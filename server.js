@@ -107,34 +107,6 @@ const generateContent = async (prompt, res) => {
 
     console.log("▶ Calling OpenAI with model:", currentModel);
 
-    // CLAUDE integration block
-    if (currentModel.startsWith("claude")) {
-      try {
-        const stream = await anthropic.messages.stream({
-          model: currentModel,
-          max_tokens: 1024,
-          messages: [
-            { role: "user", content: userPrompt01 + prompt },
-          ],
-        });
-
-        for await (const message of stream) {
-          const delta = message.delta?.text;
-          if (delta) {
-            res.write(`data: ${JSON.stringify({ type: "text", props: { content: delta } })}\n\n`);
-          }
-        }
-
-        res.write("data: [DONE]\n\n");
-        res.end();
-        return; // ⬅️ Prevent continuing into OpenAI logic
-      } catch (err) {
-        console.error("Claude streaming error:", err);
-        res.status(500).json({ error: "Claude failed to respond." });
-        return;
-      }
-    }
-
     const response = await openai.chat.completions.create({
       model: currentModel,
       messages: [
