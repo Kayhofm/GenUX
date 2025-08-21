@@ -1,21 +1,25 @@
-[{
+[
+  {
     "type": "function",
     "function": {
-        "name": "get_products",
-        "description": "Get product information from Amazon",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "query": {
-                    "type": "string",
-                    "description": "Product search query, e.g. 'Women's fashionable sunglasses'"
-                }
-            },
-            "required": [
-                "query"
-            ],
-            "additionalProperties": false
+      "name": "get_yelp",
+      "description": "Get local business listings from Yelp",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search term, e.g. 'coffee shop' or 'vegan bakery'"
+          },
+          "location": {
+            "type": "string",
+            "description": "City or neighborhood to search in, e.g. 'Seattle' or 'Capitol Hill'"
+          }
         },
-        "strict": true
+        "required": ["query"],
+        "additionalProperties": false
+      },
+      "strict": true
     }
-}]
+  }
+]

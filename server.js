@@ -17,6 +17,7 @@ const toolDefinition = JSON.parse(fs.readFileSync('./toolDefinition.json', 'utf8
 
 import { generateImage, generateImageDalle, getImageStore, imageEventEmitter } from "./imageCreator.js";
 import { getAmazonProducts } from "./toolAmazon.js";
+import { getYelpBusinesses } from "./toolYelp.js";
 
 // const openai = new OpenAI({
 //   apiKey: process.env.OPENAI_API_KEY,
@@ -159,19 +160,17 @@ const generateContent = async (prompt, res) => {
             }
           })}\n\n`);
 
-          if (toolCallBuffer.name === 'get_products') {
-            const products = await getAmazonProducts(args.query);
-            
-            // Create a new OpenAI chat completion for processing the products
-            console.log("Generating UI components for products");
+          if (toolCallBuffer.name === 'get_yelp') {
+            const businesses = await getYelpBusinesses(args.query, args.location || "Seattle, WA");
+
             const productResponse = await openai.chat.completions.create({
               model: currentModel,
               messages: [
                 { role: "system", content: systemPrompt01 },
-                { role: "user", content: `Generate UI components with these products to respond to the user prompt: ${JSON.stringify(products.results)}. The original user prompt was: `, prompt },
+                { role: "user", content: `Generate UI components from these Yelp listings to respond to the user prompt: ${JSON.stringify(businesses.results)}. The original user prompt was: ${prompt}` },
                 { role: "assistant", content: contextWindow }
               ],
-              stream: true,
+              stream: true
             });
 
             // Process the streaming response using the same buffer logic as the main content

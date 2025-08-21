@@ -1,0 +1,21 @@
+[{
+    "type": "function",
+    "function": {
+        "name": "get_products",
+        "description": "Get product information from Amazon",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Product search query, e.g. 'Women's fashionable sunglasses'"
+                }
+            },
+            "required": [
+                "query"
+            ],
+            "additionalProperties": false
+        },
+        "strict": true
+    }
+}]
