@@ -107,6 +107,63 @@ const generateContent = async (prompt, res) => {
 
     console.log("▶ Calling OpenAI with model:", currentModel);
 
+    if (currentModel.startsWith("claude")) {
+      try {
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+
+        const stream = await anthropic.messages.stream({
+          model: currentModel,
+          max_tokens: 1024,
+          messages: [
+            { role: "user", content: userPrompt01 + prompt },
+          ],
+        });
+
+        let buffer = "";
+        let fullMessage = "";
+
+        for await (const message of stream) {
+          const delta = message.delta?.text;
+          if (delta) {
+            buffer += delta;
+            fullMessage += delta;
+
+            // Try to parse buffer just like OpenAI streaming
+            let tempBuffer = buffer;
+
+            if (tempBuffer.startsWith("[")) tempBuffer = tempBuffer.slice(1);
+            if (tempBuffer.endsWith("]")) tempBuffer = tempBuffer.slice(0, -1);
+            if (tempBuffer.endsWith(",")) tempBuffer = tempBuffer.slice(0, -1);
+
+            tempBuffer = `[${tempBuffer}]`;
+
+            try {
+              const parsed = JSON.parse(tempBuffer);
+              if (Array.isArray(parsed)) {
+                parsed.forEach((item) => {
+                  res.write(`data: ${JSON.stringify(item)}\n\n`);
+                });
+                buffer = ""; // reset after flush
+              }
+            } catch (e) {
+              // Continue accumulating
+            }
+          }
+        }
+
+        res.write("data: [DONE]\n\n");
+        res.end();
+        sessionMessages[sessionId + 1] = "\nUser prompt: " + prompt + "\nAssistant response:\n" + fullMessage;
+        return;
+      } catch (error) {
+        console.error("Claude Streaming Error:", error.message);
+        res.status(500).json({ error: "Failed to generate content with Claude." });
+        return;
+      }
+    }
+
     const response = await openai.chat.completions.create({
       model: currentModel,
       messages: [
