@@ -117,7 +117,7 @@ const generateContent = async (prompt, res) => {
         const stream = await anthropic.messages.stream({
           model: currentModel,
           max_tokens: 2048,
-          role: "system", content: systemPrompt01,
+          system: systemPrompt01,
           messages: [
             { role: "user", content: userPrompt01 + prompt },
           ],
