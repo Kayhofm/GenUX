@@ -105,7 +105,7 @@ const generateContent = async (prompt, res) => {
       .map(id => sessionMessages[id] || "") // Map to message content
       .join(""); // Concatenate all messages
 
-    console.log("▶ Calling OpenAI with model:", currentModel);
+    console.log("▶ Calling LLM with model:", currentModel);
 
     if (currentModel.startsWith("claude")) {
       try {
@@ -129,13 +129,13 @@ const generateContent = async (prompt, res) => {
 
         for await (const message of stream) {
           const delta = message.delta?.text;
-          console.log("📨 Claude chunk:", delta); // debug here
+          console.log("📨 Claude chunk:", delta);
 
           if (delta) {
             buffer += delta;
             fullMessage += delta;
 
-            // Try to parse buffer just like OpenAI streaming
+            // Try to parse buffer
             let tempBuffer = buffer;
 
             if (tempBuffer.startsWith("[")) tempBuffer = tempBuffer.slice(1);
@@ -148,6 +148,29 @@ const generateContent = async (prompt, res) => {
               const parsed = JSON.parse(tempBuffer);
               if (Array.isArray(parsed)) {
                 parsed.forEach((item) => {
+
+                      // image augmentation logic
+                      if (item.type === "image") {
+                        item.type = "borderImage";
+                      }
+                      if (item.type === "list-item") {
+                        if (typeof imgID === "undefined" || imgID === null) {
+                          imgID = 1000;
+                        } else {
+                          imgID++;
+                        }
+
+                        item.props.imageSrc = "";
+                        item.props.imageID = imgID;
+
+                        try {
+                          const imageUrl = generateImage(imgID, item.props.columns, item.props.content || "a broken image");
+                        } catch (error) {
+                          console.error("Error generating image:", error.message);
+                          item.props.imageSrc = "/img/default-image.png";
+                        }
+                      }
+
                   res.write(`data: ${JSON.stringify(item)}\n\n`);
                 });
                 buffer = ""; // reset after flush
