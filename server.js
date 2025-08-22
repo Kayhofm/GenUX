@@ -119,6 +119,7 @@ const generateContent = async (prompt, res) => {
           max_tokens: 2048,
           system: systemPrompt01,
           messages: [
+            { role: "assistant", content: contextWindow },
             { role: "user", content: userPrompt01 + prompt },
           ],
         });
