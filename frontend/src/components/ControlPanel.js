@@ -5,7 +5,7 @@ import API_CONFIG from '../config/api';
 function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [model, setModel] = useState("gpt-4o-mini");
+  const [model, setModel] = useState("claude-3-5-haiku-20241022");
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const [bypassKey, setBypassKey] = useState('');
