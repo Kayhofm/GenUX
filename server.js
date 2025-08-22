@@ -114,15 +114,20 @@ const generateContent = async (prompt, res) => {
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Connection", "keep-alive");
 
-        const stream = await anthropic.messages.stream({
-          model: currentModel,
-          max_tokens: 2048,
-          system: systemPrompt01,
-          messages: [
-            { role: "assistant", content: contextWindow },
-            { role: "user", content: userPrompt01 + prompt },
-          ],
-        });
+      const messageList = [];
+
+      if (contextWindow && contextWindow.trim().length > 0) {
+        messageList.push({ role: "assistant", content: contextWindow });
+      }
+
+      messageList.push({ role: "user", content: userPrompt01 + prompt });
+
+      const stream = await anthropic.messages.stream({
+        model: currentModel,
+        max_tokens: 2048,
+        system: systemPrompt01,
+        messages: messageList,
+      });
         console.log("🟢 Claude stream opened");
 
         let buffer = "";
