@@ -73,7 +73,7 @@ if(!sessionMessages[999]) sessionMessages[999] = 0;
 let imgID = 1000;
 
 // Global variable for model
-let currentModel = "gpt-4o-mini";
+let currentModel = "claude-3-5-haiku-20241022";
 
 // Log all incoming requests
 app.use((req, res, next) => {
