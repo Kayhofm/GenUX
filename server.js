@@ -136,7 +136,7 @@ const generateContent = async (prompt, res) => {
 
         for await (const message of stream) {
           const delta = message.delta?.text;
-          console.log("📨 Claude chunk:", delta);
+          // console.log("📨 Claude chunk:", delta);
 
           if (delta) {
             buffer += delta;
@@ -223,7 +223,7 @@ const generateContent = async (prompt, res) => {
 
     for await (const chunk of response) {
 
-      console.log("📦 Raw chunk received:", JSON.stringify(chunk));
+      // console.log("📦 Raw chunk received:", JSON.stringify(chunk));
 
       const delta = chunk.choices[0]?.delta;
       
