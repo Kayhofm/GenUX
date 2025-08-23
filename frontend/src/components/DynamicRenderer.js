@@ -41,6 +41,8 @@ function DynamicRenderer({ component, onContentGenerated }) {
         formDescription ? `. Form values are: ${formDescription}` : ''
       }. Generate a new UI based on this input.`;
 
+      const ID = component.props.ID || null;
+
       // Reset content before fetching new data
       onContentGenerated([]);
 
@@ -50,7 +52,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ content: buttonPrompt }),
+        body: JSON.stringify({ content: buttonPrompt, ID: ID }),
       })
         .then((response) => {
           if (!response.ok) {

@@ -157,30 +157,6 @@ const generateContent = async (prompt, res) => {
                 parsed.forEach((item) => {
 
                       // image augmentation logic
-                      /*
-                      if (item.type === "image") {
-                        item.type = "borderImage";
-                      }
-                      if (item.type === "list-item") {
-                        if (typeof imgID === "undefined" || imgID === null) {
-                          imgID = 1000;
-                        } else {
-                          imgID++;
-                        }
-
-                        item.props.imageSrc = "";
-                        item.props.imageID = imgID;
-
-                        try {
-                          const imageUrl = generateImage(imgID, item.props.columns, item.props.content || "a broken image");
-                          item.props.imageSrc = imageUrl; // Set the image URL
-                        } catch (error) {
-                          console.error("Error generating image:", error.message);
-                          item.props.imageSrc = "/img/default-image.png";
-                        }
-                      }
-                        */
-
                       if (item.type === "image" || item.type === "borderImage" || item.type === "list-item") {
                         if (typeof imgID === "undefined" || imgID === null) {
                           imgID = 1000;
@@ -198,9 +174,6 @@ const generateContent = async (prompt, res) => {
                           console.error("Error generating image:", error.message);
                           item.props.imageSrc = "/img/default-image.png"; // fallback
                         }
-
-                        // Optionally set style
-                        // item.type = "borderImage";  // ← optional, since you now support both
                       }
 
                   res.write(`data: ${JSON.stringify(item)}\n\n`);
@@ -500,8 +473,8 @@ app.post("/api/generate-image", async (req, res) => {
 });
 
 app.post("/api/button-click", async (req, res) => {
-  const { content } = req.body;
-  console.log("Button click attempted with content:", JSON.stringify(content));
+  const { content, ID } = req.body;
+  console.log("Button click attempted with content:", JSON.stringify(content), "and ID:", ID);
 
   if (!content || typeof content === 'object') {
     console.log("Rejected button click due to invalid content type");
@@ -511,7 +484,7 @@ app.post("/api/button-click", async (req, res) => {
   console.log("Button clicked with content:", content);
 
   try {
-    const buttonPrompt = "The user clicked the button that says: \"" + content + "\". Generate a new UI based on this button click.";
+    const buttonPrompt = "The user clicked the button that says: \"" + content + "\" with ID: " + ID + ". Generate a new UI based on this button click.";
     await generateContent(buttonPrompt, res);
   } catch (error) {
     console.error("Error generating content for button click:", error.message);
