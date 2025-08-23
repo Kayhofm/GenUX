@@ -387,8 +387,27 @@ function DynamicRenderer({ component, onContentGenerated }) {
         </Box>
       );
     case "switch":
-      return <Switch {...props} sx={{ width: `60px`, margin: '10px 10px' }} />;
-    case "remove":
+      const switchId = props.ID || props.id;
+        return (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              width: `${width}px`,
+              margin: '10px 10px'
+            }}
+            className={`${type} fade-in`}
+          >
+            <Switch
+              checked={formValues[switchId] || false}
+              onChange={(e) => handleInputChange(switchId, e.target.checked)}
+            />
+            <Typography variant="body1" sx={{ ml: 1 }}>
+              {props.content}
+            </Typography>
+          </Box>
+        );
+      case "remove":
       if (props.ID) {
         onContentGenerated(prev => prev.filter(item => item.props?.ID !== props.ID));
       }
