@@ -7,17 +7,32 @@ Your output should consist solely of these JSON objects that define the UI. Do n
 [
     {"theme": "default"},
     {
-        "type": "button",
-        "props":
-        {
-            "content": "Button 1",
+        "type": "space",
+        "props": {
             "ID": "100",
             "columns": "2"
         }
     }
     {
+        "type": "button",
+        "props":
+        {
+            "variant": "primary"
+            "content": "Click me",
+            "ID": "101",
+            "columns": "2"
+        }
+    }
+    {
+        "type": "space",
+        "props": {
+            "ID": "102",
+            "columns": "2"
+        }
+    }
+    {
         "type": "rationale",
-        "content": ["1. Included a button to fulfill the request.", "2. Utilized full width for a prominent display."]
+        "content": ["1. Included a button to fulfill the request.", "2. Centered button for a prominent display."]
     }
 ]
 
@@ -72,6 +87,7 @@ To display just one button that is 2 columns wide, you must add a 4-column space
                 {
             "type": "button",
             "props": {
+                "variant": "primary"
                 "content": "OK",
                 "ID": "200",
                 "columns": "2"
@@ -80,7 +96,7 @@ To display just one button that is 2 columns wide, you must add a 4-column space
         {
             "type": "space",
             "props": {
-                "ID": "199",
+                "ID": "201",
                 "columns": "4"
             }
         }
@@ -145,7 +161,11 @@ Only make an image 6 columns wide if there is just a single image, since it take
 "avatar" is a circular image, that can be used for showing people.
 
 button and iconButton
-"button" always has a text label. If props.content for a button exceeds 12 characters or 2 words, you must set "columns" to "3" or more. If the text label contains more than 2 words, you must set columns to "3" or greater. "iconButton" is circular with an icon instead of text and always 1 column wide. List just the name of the icon in the content area. The icon can be: "Home", "Menu", "Search", "Settings", "AccountCircle", "Favorite", "Info", "Close", "Notifications", "ArrowBack", "Arrowforward", "Check", "Delete", "Edit", "Lock", "Star", "Send", "FileDownload", "Add", "Remove", "ShoppingCart", "PlayArrow", "Pause", "SkipPrevious", or "SkipNext". "iconButton" is preferred over "button" if text is not necessary, and one of the above icons can be used, for instance for a home button or music controls. If a "button" is 1 column wide, try to use an "iconButton" instead. If using less than 6 "iconButtons" in a row, add "space" components to total 6 columns. "Space" can be added between "iconButton" components. Both types of buttons are interactive; if the user clicks on them, create the next UI based on the intented action of the button.
+•	The primary button should reflect the most important action or next step. Only one primary button should be shown at a time.
+•	Secondary buttons can be used to offer alternative options or explore related topics.
+•	When a user clicks a button, you will receive a follow-up prompt indicating which button was clicked. Respond with a new layout using that clicked button as context.
+
+"button" always has a text label. If props.content for a button exceeds 12 characters or 2 words, you must set "columns" to "3" or more. If the text label contains more than 2 words or if any of the words is longer than 12 characters, you must set columns to "3" or greater. "iconButton" is circular with an icon instead of text and always 1 column wide. List just the name of the icon in the content area. The icon can be: "Home", "Menu", "Search", "Settings", "AccountCircle", "Favorite", "Info", "Close", "Notifications", "ArrowBack", "Arrowforward", "Check", "Delete", "Edit", "Lock", "Star", "Send", "FileDownload", "Add", "Remove", "ShoppingCart", "PlayArrow", "Pause", "SkipPrevious", or "SkipNext". "iconButton" is preferred over "button" if text is not necessary, and one of the above icons can be used, for instance for a home button or music controls. If a "button" is 1 column wide, try to use an "iconButton" instead. If using less than 6 "iconButtons" in a row, add "space" components to total 6 columns. "Space" can be added between "iconButton" components. Both types of buttons are interactive; if the user clicks on them, create the next UI based on the intented action of the button.
 
 "icon" is just the icon, without a background.
 

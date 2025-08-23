@@ -236,6 +236,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
       return (
         <Button
           variant="contained"
+          color={props.variant === "secondary" ? "secondary" : "primary"}  // defaults to "primary"
           className={`${type} fade-in`}
           sx={{ width: `${width}px`, margin: '10px 10px', maxHeight: '61px' }}
           onClick={handleClick}
