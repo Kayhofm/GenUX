@@ -610,9 +610,66 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('PORT environment variable:', process.env.PORT);
 });
 
-// Logging webpage
+// Logging webpage with collapsible blocks and newest-first order
 app.get("/logs", (req, res) => {
   const content = fs.readFileSync(logFilePath, "utf8");
-  res.setHeader("Content-Type", "text/plain");
-  res.send(content);
+  const lines = content.trim().split('\n');
+
+  const entries = lines.reverse().map((line, index) => {
+    try {
+      const entry = JSON.parse(line);
+      const resultFormatted = JSON.stringify(JSON.parse(entry.result), null, 2);
+
+      return `
+        <div class="entry">
+          <p><strong>${entry.timestamp}</strong> | <code>${entry.type}</code> | <code>${entry.model}</code> | IP: ${entry.ip}</p>
+          <p><strong>Prompt:</strong> ${entry.prompt}</p>
+          <details>
+            <summary><strong>Result (click to expand)</strong></summary>
+            <pre>${resultFormatted}</pre>
+          </details>
+        </div>
+        <hr />
+      `;
+    } catch (e) {
+      return `<p>Error parsing line ${index + 1}</p>`;
+    }
+  }).join('\n');
+
+  res.send(`
+    <html>
+      <head>
+        <title>Interaction Logs</title>
+        <style>
+          body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #f9f9f9;
+          }
+          .entry {
+            margin-bottom: 24px;
+          }
+          pre {
+            background: #eee;
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+          }
+          summary {
+            cursor: pointer;
+            font-weight: bold;
+          }
+          code {
+            background: #e1e1e1;
+            padding: 2px 4px;
+            border-radius: 3px;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Interaction Logs</h1>
+        ${entries}
+      </body>
+    </html>
+  `);
 });
