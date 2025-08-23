@@ -135,7 +135,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
       <div style={{ marginTop: '20px', textAlign: 'left' }}>
         <label htmlFor="model-dropdown" style={{ marginRight: '8px' }}>Model</label>
         <select id="model-dropdown" value={model} onChange={handleModelChange}>
-          <option value="claude-3-5-haiku-20241022">Claude Haiku 3.5 (best)</option>
+          <option value="claude-3-5-haiku-20241022">Claude Haiku 3.5 (balanced)</option>
           <option value="gpt-4o-mini">gpt-4o-mini (fastest)</option>
           <option value="gpt-4o">gpt-4o</option>
           <option value="gpt-5-mini">gpt-5-mini</option>

@@ -1,8 +1,7 @@
-// import dotenv from "dotenv";
-// dotenv.config(); // Load environment variables
+import dotenv from "dotenv";
 
 if (process.env.NODE_ENV !== 'production') {
-  import('dotenv').then(dotenv => dotenv.config());
+  dotenv.config();
 }
 
 import express from "express";
@@ -36,6 +35,8 @@ if (process.env.OPENAI_API_KEY) {
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
+
+console.log("✅ Environment loaded. Anthropic key:", process.env.ANTHROPIC_API_KEY ? "Present" : "Missing");
 
 const bypassKey = process.env.BYPASS_KEY;
 const tools = toolDefinition;
