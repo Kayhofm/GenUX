@@ -76,6 +76,33 @@ let imgID = 1000;
 // Global variable for model
 let currentModel = "claude-3-5-haiku-20241022";
 
+// Set model route
+app.post("/api/set-model", (req, res) => {
+  const { model } = req.body;
+  currentModel = model;
+  console.log("Model updated to:", model);
+  res.json({ success: true, model });
+});
+
+const logFilePath = './logs/interaction_logs.txt';
+fs.mkdirSync('./logs', { recursive: true }); // ensure the folder exists
+
+// Create a reusable log function
+function logInteraction({ type, prompt, result, ip, model, id }) {
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    type, // "text" or "button"
+    prompt,
+    result,
+    model,
+    ip,
+    id
+  };
+
+  const logLine = JSON.stringify(logEntry) + '\n';
+  fs.appendFileSync(logFilePath, logLine);
+}
+
 // Log all incoming requests
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
@@ -188,6 +215,16 @@ const generateContent = async (prompt, res) => {
 
         res.write("data: [DONE]\n\n");
         res.end();
+
+        logInteraction({
+          type: "text",
+          prompt,
+          result: fullMessage,
+          model: currentModel,
+          ip: res.req.ip,
+          id: sessionId
+        });
+
         sessionMessages[sessionId + 1] = "\nUser prompt: " + prompt + "\nAssistant response:\n" + fullMessage;
         return;
       } catch (error) {
@@ -423,6 +460,15 @@ const generateContent = async (prompt, res) => {
     res.write("data: [DONE]\n\n"); // Signal completion
     res.end();
 
+    logInteraction({
+      type: "text",
+      prompt,
+      result: fullMessage,
+      model: currentModel,
+      ip: res.req.ip,
+      id: sessionId
+    });
+    
     // Save full message to session store
     sessionMessages[sessionId+1] = "\nUser prompt: " + prompt + "\nAssistant response:\n" + fullMessage;
 
@@ -486,6 +532,16 @@ app.post("/api/button-click", async (req, res) => {
   try {
     const buttonPrompt = "The user clicked the button that says: \"" + content + "\" with ID: " + ID + ". Generate a new UI based on this button click.";
     await generateContent(buttonPrompt, res);
+
+    logInteraction({
+      type: "button",
+      prompt: buttonPrompt,
+      result: "", // Or save response if needed
+      model: currentModel,
+      ip: req.ip,
+      id: ID
+    });
+
   } catch (error) {
     console.error("Error generating content for button click:", error.message);
     res.status(500).json({ error: "Failed to generate content for button click" });
@@ -552,4 +608,11 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
   console.log('PORT environment variable:', process.env.PORT);
+});
+
+// Logging webpage
+app.get("/logs", (req, res) => {
+  const content = fs.readFileSync(logFilePath, "utf8");
+  res.setHeader("Content-Type", "text/plain");
+  res.send(content);
 });

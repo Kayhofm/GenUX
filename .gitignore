@@ -39,3 +39,6 @@ Thumbs.db
 
 # production
 /build
+
+#logging
+/logs/interaction_logs.txt
