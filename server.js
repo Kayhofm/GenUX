@@ -603,6 +603,29 @@ app.post("/api/set-model", (req, res) => {
   res.status(200).json({ message: "Model updated", model: currentModel });
 });
 
+app.post("/api/comment", (req, res) => {
+  const { comment } = req.body;
+
+  if (!comment || comment.trim() === "") {
+    return res.status(400).json({ error: "Comment is required" });
+  }
+
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    type: "comment",
+    prompt: comment,
+    result: "", // no UI result
+    model: "",  // not model-based
+    ip: req.ip,
+    id: "comment"
+  };
+
+  const logLine = JSON.stringify(logEntry) + '\n';
+  fs.appendFileSync('./logs/interaction_logs.txt', logLine);
+
+  res.status(200).json({ success: true });
+});
+
 // Updated port configuration for Railway
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, '0.0.0.0', () => {
@@ -618,16 +641,29 @@ app.get("/logs", (req, res) => {
   const entries = lines.reverse().map((line, index) => {
     try {
       const entry = JSON.parse(line);
-      const resultFormatted = JSON.stringify(JSON.parse(entry.result), null, 2);
-
+      let resultFormatted;
+      try {
+        resultFormatted = JSON.stringify(JSON.parse(entry.result), null, 2);
+      } catch {
+        resultFormatted = entry.result || "(No result)";
+      }
       return `
         <div class="entry">
-          <p><strong>${entry.timestamp}</strong> | <code>${entry.type}</code> | <code>${entry.model}</code> | IP: ${entry.ip}</p>
-          <p><strong>Prompt:</strong> ${entry.prompt}</p>
-          <details>
-            <summary><strong>Result (click to expand)</strong></summary>
-            <pre>${resultFormatted}</pre>
-          </details>
+        <p><strong>${new Date(entry.timestamp).toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        })}</strong> | <code>${entry.type}</code> | <code>${entry.model}</code> | IP: ${entry.ip}</p>
+        <p><strong>${entry.type === "comment" ? "Comment" : "Prompt"}:</strong> ${entry.prompt}</p>
+          ${entry.type !== "comment" ? `
+            <details>
+              <summary><strong>Result (click to expand)</strong></summary>
+              <pre>${resultFormatted}</pre>
+            </details>
+          ` : ""}
         </div>
         <hr />
       `;

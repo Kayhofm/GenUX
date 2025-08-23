@@ -9,6 +9,9 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const [bypassKey, setBypassKey] = useState('');
+  const [comment, setComment] = useState("");
+  const [commentStatus, setCommentStatus] = useState("");
+  const [commentSubmitting, setCommentSubmitting] = useState(false);
 
   useEffect(() => {
     if ('webkitSpeechRecognition' in window) {
@@ -82,6 +85,30 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
       .finally(() => setLoading(false));
   };
 
+  const handleCommentSubmit = async () => {
+    if (!comment.trim()) return;
+
+    setCommentSubmitting(true);
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/api/comment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ comment }),
+      });
+
+      if (!response.ok) throw new Error("Failed to submit comment");
+
+      setComment("");
+      setCommentStatus("Thank you for your comment!");
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+      setCommentStatus("❌ Error saving comment.");
+    } finally {
+      setCommentSubmitting(false);
+      setTimeout(() => setCommentStatus(""), 2000);
+    }
+  };
+
   return (
     <div className="control-panel">
       <textarea
@@ -141,6 +168,38 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
           <option value="gpt-5-mini">gpt-5-mini</option>
           <option value="gpt-5-nano">gpt-5-nano</option>
         </select>
+      </div>
+
+      {/* Comment logging section */}
+      <div style={{ marginTop: '30px', padding: '0px', borderTop: '1px solid #ccc', textAlign: 'left' }}>
+        <textarea
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="Please leave a comment"
+          rows="3"
+          style={{ width: '100%', marginBottom: '8px', resize: 'vertical' }}
+        />
+        {commentStatus && (
+          <div style={{ marginTop: '8px', color: '#007700' }}>
+            {commentStatus}
+          </div>
+        )}
+        <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+          <button
+            type="submit"
+            onClick={handleCommentSubmit}
+            disabled={commentSubmitting}
+            style={{
+              padding: '6px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              color: isListening ? 'red' : 'inherit',
+            }}
+          >
+            {commentSubmitting ? "Saving..." : "Submit Comment"}
+          </button>
+        </div>
       </div>
 
       {/* Bypass key input */}
