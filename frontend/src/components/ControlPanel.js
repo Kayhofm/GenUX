@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { streamOpenAIContent } from "../services/openaiService";
 import API_CONFIG from '../config/api';
 
@@ -12,6 +12,8 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
   const [comment, setComment] = useState("");
   const [commentStatus, setCommentStatus] = useState("");
   const [commentSubmitting, setCommentSubmitting] = useState(false);
+  const DEFAULT_PROMPT = "This is a new user. They are interested in seeing all your features. Please show off what you can do.";
+  const hasRunInitialPrompt = useRef(false);
 
   useEffect(() => {
     if ('webkitSpeechRecognition' in window) {
@@ -37,6 +39,25 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
       setRecognition(recognition);
     }
   }, [setPrompt]);
+
+  useEffect(() => {
+    if (!prompt && !hasRunInitialPrompt.current) {
+      hasRunInitialPrompt.current = true;
+
+      setPrompt(DEFAULT_PROMPT);
+      setLoading(true);
+      onContentGenerated([]); // Clear previous content
+
+      streamOpenAIContent(DEFAULT_PROMPT, (data) => {
+        onContentGenerated((prev) => [...prev, data]);
+      }, bypassKey)
+        .catch((err) => {
+          console.error("Initial generation failed:", err);
+          setError("Failed to generate default content.");
+        })
+        .finally(() => setLoading(false));
+    }
+  }, []);
 
   const toggleListening = () => {
     if (!recognition) return;
