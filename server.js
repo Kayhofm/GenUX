@@ -116,6 +116,7 @@ const generateContent = async (prompt, res) => {
     sessionMessages[9999]++;
   };
   const sessionId = sessionMessages[9999];
+  let messageList = [];
 
   if (!prompt) {
     return res.status(400).json({ error: "Prompt is required" });
@@ -128,10 +129,17 @@ const generateContent = async (prompt, res) => {
 
     console.log("New request: ", prompt);
 
-    const sessionIds = [sessionId - 2, sessionId - 1, sessionId]; // Include multiple sessions
-    const contextWindow = sessionIds
-      .map(id => sessionMessages[id] || "") // Map to message content
-      .join(""); // Concatenate all messages
+    const sessionIds = [sessionId - 2, sessionId - 1, sessionId];
+
+    sessionIds.forEach(id => {
+      const pair = sessionMessages[id];
+      if (Array.isArray(pair)) {
+        messageList.push(...pair); // Flatten user+assistant pairs
+      }
+    });
+
+    // Add current prompt with userPrompt01 prefix
+    messageList.push({ role: "user", content: userPrompt01 + prompt });
 
     console.log("▶ Calling LLM with model:", currentModel);
 
@@ -141,14 +149,6 @@ const generateContent = async (prompt, res) => {
         res.setHeader("Content-Type", "text/event-stream");
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Connection", "keep-alive");
-
-      const messageList = [];
-
-      if (contextWindow && contextWindow.trim().length > 0) {
-        messageList.push({ role: "assistant", content: contextWindow });
-      }
-
-      messageList.push({ role: "user", content: userPrompt01 + prompt });
 
       const stream = await anthropic.messages.stream({
         model: currentModel,
@@ -225,7 +225,11 @@ const generateContent = async (prompt, res) => {
           id: sessionId
         });
 
-        sessionMessages[sessionId + 1] = "\nUser prompt: " + prompt + "\nAssistant response:\n" + fullMessage;
+        sessionMessages[sessionId + 1] = [
+          { role: "user", content: userPrompt01 + prompt },
+          { role: "assistant", content: fullMessage }
+        ];
+        
         return;
       } catch (error) {
         console.error("Claude Streaming Error:", error.message);
@@ -238,9 +242,9 @@ const generateContent = async (prompt, res) => {
       model: currentModel,
       messages: [
         { role: "system", content: systemPrompt01 },
-        { role: "user", content: userPrompt01 + prompt},
-        { role: "assistant", content: contextWindow }, // Add full previous response
+        ...messageList  // already includes the current user prompt with prefix
       ],
+
       tools,
       tool_choice: "auto",
       // response_format: {"type": "json_object"},
@@ -470,7 +474,10 @@ const generateContent = async (prompt, res) => {
     });
     
     // Save full message to session store
-    sessionMessages[sessionId+1] = "\nUser prompt: " + prompt + "\nAssistant response:\n" + fullMessage;
+    sessionMessages[sessionId + 1] = [
+      { role: "user", content: prompt },
+      { role: "assistant", content: fullMessage }
+    ];
 
   } catch (error) {
     console.error("Streaming Error:", error.response?.status, error.response?.data || error.message);
