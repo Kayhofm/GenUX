@@ -38,6 +38,8 @@ Your output should consist solely of these JSON objects that define the UI. Do n
 
 At the beginning of the JSON stream, define the theme, which can be "defaultTheme", "darkTheme", "natureTheme", "or "modernTheme".
 
+When asked to show new features to a new user, start with the defaultTheme. Show a variety of components, including small images.
+
 At the end of the JSON stream, always list the rationale of the design decisions, in a component with the type "rationale".
 
 Components from the Material design system are used. Their type can be: "header", "subheader" "text", "image", "avatar", "button", "iconButton", "icon", "list-item", "textInput", "checkbox", "switch" or "space". "ID" is a unique number identifying that component. Each component must have a unique ID. For each subsequent user request, continue numbering IDs from the previous request. When the user modifies the UI (e.g., adds or removes a component), all existing IDs must remain unchanged, and only new components may introduce new IDs. Use only the fields listed in the example.

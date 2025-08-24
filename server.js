@@ -530,7 +530,7 @@ app.post("/api/button-click", async (req, res) => {
   console.log("Button clicked with content:", content);
 
   try {
-    const buttonPrompt = "The user clicked the button that says: \"" + content + "\" with ID: " + ID + ". Generate a new UI based on this button click.";
+    const buttonPrompt = content + " with ID: " + ID + ". Generate a new UI based on this button click.";
     await generateContent(buttonPrompt, res);
 
     logInteraction({

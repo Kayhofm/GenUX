@@ -39,7 +39,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
 
       const buttonPrompt = `The user clicked ${label}${
         formDescription ? `. Form values are: ${formDescription}` : ''
-      }. Generate a new UI based on this input.`;
+      }`;
 
       const ID = component.props.ID || null;
 
