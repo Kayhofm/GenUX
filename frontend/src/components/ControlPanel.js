@@ -137,14 +137,13 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
 
       {/* Intro message */}
       <div style={{ marginTop: '20px', marginBottom: '12px', color: '#555', textAlign: 'left'  }}>
-        This is an interactive AI demo that generates real-time user interfaces based on your prompt or actions.<br /><br />
-        To start, try out a variation of these prompts in the input field below: "I want to cook lasagna" or "Pay my utility bill".
+        This is an interactive AI demo that generates real-time user interfaces based on your prompt or actions.
       </div>
 
       {/* One-time message */}
       {showIntro && (
-        <div style={{ marginTop: '8px', marginBottom: '12px', color: '#555', textAlign: 'left'  }}>
-          This prompt was rendered in the panel on the right by the AI listed in the model dropdown. Feel free to interact with the UI or try your own prompt.
+        <div style={{ marginTop: '8px', marginBottom: '16px', color: '#555', textAlign: 'left'  }}>
+          This prompt was rendered in the panel on the right by the AI listed in the model dropdown. Feel free to interact with the UI or input your own prompt. For instance, try a variation of these prompts in the input field below: "I want to cook lasagna" or "Pay my utility bill".
         </div>
       )}
 
@@ -192,7 +191,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
       {/* Model dropdown */}
       <div style={{ marginTop: '20px', textAlign: 'left' }}>
         <label htmlFor="model-dropdown" style={{ marginRight: '8px' }}>Model</label>
-        <select id="model-dropdown" value={model} onChange={handleModelChange}>
+        <select id="model-dropdown" value={model} onChange={handleModelChange} style={{ padding: '6px 12px' }}>
           <option value="claude-3-5-haiku-20241022">Claude Haiku 3.5 (balanced)</option>
           <option value="gpt-4o-mini">gpt-4o-mini (fastest)</option>
           <option value="gpt-4o">gpt-4o</option>
