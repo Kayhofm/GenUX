@@ -14,6 +14,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
   const [commentSubmitting, setCommentSubmitting] = useState(false);
   const DEFAULT_PROMPT = "This is a new user. They are interested in seeing all your features. Please show off what you can do.";
   const hasRunInitialPrompt = useRef(false);
+  const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {
     if ('webkitSpeechRecognition' in window) {
@@ -86,6 +87,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
   };
 
   const handleGenerate = () => {
+    setShowIntro(false);
     setLoading(true);
     setError(null);
     onContentGenerated([]); // Clear previous content
@@ -132,6 +134,20 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
 
   return (
     <div className="control-panel">
+
+      {/* Intro message */}
+      <div style={{ marginTop: '20px', marginBottom: '12px', color: '#555', textAlign: 'left'  }}>
+        This is an interactive AI demo that generates real-time user interfaces based on your prompt or actions.<br /><br />
+        To start, try out a variation of these prompts in the input field below: "I want to cook lasagna" or "Pay my utility bill".
+      </div>
+
+      {/* One-time message */}
+      {showIntro && (
+        <div style={{ marginTop: '8px', marginBottom: '12px', color: '#555', textAlign: 'left'  }}>
+          This prompt was rendered in the panel on the right by the AI listed in the model dropdown. Feel free to interact with the UI or try your own prompt.
+        </div>
+      )}
+
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
@@ -172,12 +188,6 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
 
       {/* Error display */}
       {error && <p className="error" style={{ marginTop: '12px', color: 'red' }}>{error}</p>}
-
-      {/* Intro message */}
-      <div style={{ marginTop: '20px', color: '#555', textAlign: 'left'  }}>
-        This is an interactive AI demo that generates real-time user interfaces based on your prompt or actions.<br /><br />
-        To start, try out a variation of these prompts: "I want to cook lasagna" or "Pay my utility bill".
-      </div>
 
       {/* Model dropdown */}
       <div style={{ marginTop: '20px', textAlign: 'left' }}>
