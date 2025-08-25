@@ -226,12 +226,17 @@ function DynamicRenderer({ component, onContentGenerated }) {
           className={`${type} fade-in`}
           sx={{ width: `${width}px`, margin: '4px 10px' }}
         >
-          {props.content.split('\n').map((line, i) => (
-            <React.Fragment key={i}>
-              {line}
-              {i < props.content.split('\n').length - 1 && <br />}
-            </React.Fragment>
-          ))}
+        {props.content.split('\n').map((line, i) => (
+          <React.Fragment key={i}>
+            {line.split(/(\*\*.*?\*\*)/).map((part, j) => {
+              if (part.startsWith('**') && part.endsWith('**')) {
+                return <strong key={j}>{part.slice(2, -2)}</strong>;
+              }
+              return <React.Fragment key={j}>{part}</React.Fragment>;
+            })}
+            {i < props.content.split('\n').length - 1 && <br />}
+          </React.Fragment>
+        ))}
         </Typography>
       );
     case "button":
