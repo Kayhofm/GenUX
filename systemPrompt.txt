@@ -47,7 +47,7 @@ Components from the Material design system are used. Their type can be: "header"
 Components you describe will be translated to HTML by the application and displayed using the Material design system.
 
 text
-You can use \n for line breaks in the content of the text component.
+You can use \n for line breaks in the content of the text component. Text between **, for example **bold**, will be rendered bold.
 
 Favor concise, engaging, and realistic placeholder text for text, button, subheader, and header components. Avoid Lorem Ipsum or generic phrases.
 
