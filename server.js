@@ -184,7 +184,7 @@ const generateContent = async (prompt, res) => {
                 parsed.forEach((item) => {
 
                       // image augmentation logic
-                      if (item.type === "image" || item.type === "borderImage" || item.type === "list-item") {
+                      if (item.type === "image" || item.type === "borderImage" || item.type === "list-item" || item.type === "avatar") {
                         if (typeof imgID === "undefined" || imgID === null) {
                           imgID = 1000;
                         } else {
@@ -426,7 +426,7 @@ const generateContent = async (prompt, res) => {
               // Send each new component individually
               tempParsedData.forEach(async (item, index) => {
                
-                if (item.type === "image" || item.type === "list-item") {
+                if (item.type === "image" || item.type === "list-item" || item.type === "avatar") {
                   if (typeof imgID === "undefined" || imgID === null) {
                     imgID = 1;
                   } else {
