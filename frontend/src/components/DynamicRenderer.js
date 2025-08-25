@@ -373,24 +373,33 @@ function DynamicRenderer({ component, onContentGenerated }) {
     case "checkbox":
       const checkboxId = props.ID || props.id;
       return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            width: `${width}px`,
+            margin: '10px 10px'
+          }}
+        >
           <Checkbox 
             {...props} 
-            sx={{ width: `42px`, margin: '10px 10px' }}
+            sx={{ padding: '0 8px 0 0', marginTop: '4px' }}
             checked={formValues[checkboxId] || false}
             onChange={(e) => handleInputChange(checkboxId, e.target.checked)}
           />
-          <Typography
-            variant="body1"
-            sx={{
-              width: `${width - 42}px`,
-              margin: '0px 0',
-              wordWrap: 'break-word',
-              whiteSpace: 'normal'
-            }}
-          >
-            {props.content}
-          </Typography>
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography
+              variant="body1"
+              align="left"
+              sx={{
+                wordWrap: 'break-word',
+                whiteSpace: 'normal',
+                lineHeight: 1.4,
+              }}
+            >
+              {props.content}
+            </Typography>
+          </Box>
         </Box>
       );
     case "switch":
