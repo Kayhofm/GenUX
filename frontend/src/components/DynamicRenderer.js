@@ -380,15 +380,17 @@ function DynamicRenderer({ component, onContentGenerated }) {
             checked={formValues[checkboxId] || false}
             onChange={(e) => handleInputChange(checkboxId, e.target.checked)}
           />
-          <TextField
-            value={props.content}
-            variant="standard"
-            disabled={true}
-            InputProps={{
-              disableUnderline: true
+          <Typography
+            variant="body1"
+            sx={{
+              width: `${width - 42}px`,
+              margin: '0px 0',
+              wordWrap: 'break-word',
+              whiteSpace: 'normal'
             }}
-            sx={{ width: `${width - 42}px`, margin: '0px 0' }}
-          />
+          >
+            {props.content}
+          </Typography>
         </Box>
       );
     case "switch":
