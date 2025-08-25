@@ -351,7 +351,7 @@ const generateContent = async (prompt, res) => {
                         if (item.type === "image") {
                           item.type = "borderImage";
                         }
-                        if (item.type === "list-item") {
+                        if (item.type === "list-item" || item.type === "avatar") {
                           if (typeof imgID === "undefined" || imgID === null) {
                             imgID = 1000;
                           } else {
