@@ -370,38 +370,38 @@ function DynamicRenderer({ component, onContentGenerated }) {
         >
         {"\u00A0"}
       </Box>;
-    case "checkbox":
-      const checkboxId = props.ID || props.id;
-      return (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            width: `${width}px`,
-            margin: '10px 10px'
-          }}
-        >
-          <Checkbox 
-            {...props} 
-            sx={{ padding: '0 8px 0 0', marginTop: '4px' }}
-            checked={formValues[checkboxId] || false}
-            onChange={(e) => handleInputChange(checkboxId, e.target.checked)}
-          />
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography
-              variant="body1"
-              align="left"
-              sx={{
-                wordWrap: 'break-word',
-                whiteSpace: 'normal',
-                lineHeight: 1.4,
-              }}
-            >
-              {props.content}
-            </Typography>
-          </Box>
+  case "checkbox":
+    const checkboxId = props.ID || props.id;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',  // ✅ Change this to center vertically
+          width: `${width}px`,
+          margin: '10px 10px'
+        }}
+      >
+        <Checkbox 
+          {...props} 
+          sx={{ padding: '0 8px 0 0' }}  // ⬅️ Remove marginTop if not needed
+          checked={formValues[checkboxId] || false}
+          onChange={(e) => handleInputChange(checkboxId, e.target.checked)}
+        />
+        <Box sx={{ flexGrow: 1 }}>
+          <Typography
+            variant="body1"
+            align="left"
+            sx={{
+              wordWrap: 'break-word',
+              whiteSpace: 'normal',
+              lineHeight: 1.4,
+            }}
+          >
+            {props.content}
+          </Typography>
         </Box>
-      );
+      </Box>
+    );
     case "switch":
       const switchId = props.ID || props.id;
         return (
