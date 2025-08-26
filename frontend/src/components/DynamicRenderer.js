@@ -333,7 +333,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
     case "list-item":
       return <ListItem
         className={`${type} fade-in`}
-        style={{ width: `${width}px`, display: "flex" }}
+        style={{ width: `${width}px`, margin: '10px 10px' , display: "flex" }}
       >
         <ListItemAvatar>
           <Avatar
