@@ -190,28 +190,6 @@ const generateContent = async (prompt, res) => {
               if (Array.isArray(parsed)) {
                 parsed.forEach((item) => {
 
-                  /*
-                      // image augmentation logic
-                      if (item.type === "image" || item.type === "borderImage" || item.type === "list-item" || item.type === "avatar") {
-                        if (typeof imgID === "undefined" || imgID === null) {
-                          imgID = 1000;
-                        } else {
-                          imgID++;
-                        }
-
-                        item.props.imageID = imgID;
-                        item.props.imageSrc = "";
-
-                        try {
-                          const imageUrl = generateImage(imgID, item.props.columns, item.props.content || "a broken image");
-                          item.props.imageSrc = imageUrl;
-                        } catch (error) {
-                          console.error("Error generating image:", error.message);
-                          item.props.imageSrc = "/img/default-image.png"; // fallback
-                        }
-                      }
-*/
-
                       // image augmentation logic
                       const needsImage = ["image", "borderImage", "list-item", "avatar"].includes(item.type);
                       const content = item.props?.content || "missing content";
@@ -655,14 +633,18 @@ app.post("/api/comment", (req, res) => {
     timestamp: new Date().toISOString(),
     type: "comment",
     prompt: comment,
-    result: "", // no UI result
-    model: "",  // not model-based
+    result: "",
+    model: "",
     ip: req.ip,
     id: "comment"
   };
 
-  const logLine = JSON.stringify(logEntry) + '\n';
-  fs.appendFileSync('./logs/interaction_logs.txt', logLine);
+  if (process.env.NODE_ENV === "production") {
+    console.log("INTERACTION_LOG:", JSON.stringify(logEntry));
+  } else {
+    const logLine = JSON.stringify(logEntry) + '\n';
+    fs.appendFileSync(logFilePath, logLine);
+  }
 
   res.status(200).json({ success: true });
 });
@@ -674,79 +656,81 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('PORT environment variable:', process.env.PORT);
 });
 
-// Logging webpage with collapsible blocks and newest-first order
-app.get("/logs", (req, res) => {
-  const content = fs.readFileSync(logFilePath, "utf8");
-  const lines = content.trim().split('\n');
+// Logging webpage – only available in local development
+if (process.env.NODE_ENV !== "production") {
+  app.get("/logs", (req, res) => {
+    const content = fs.readFileSync(logFilePath, "utf8");
+    const lines = content.trim().split('\n');
 
-  const entries = lines.reverse().map((line, index) => {
-    try {
-      const entry = JSON.parse(line);
-      let resultFormatted;
+    const entries = lines.reverse().map((line, index) => {
       try {
-        resultFormatted = JSON.stringify(JSON.parse(entry.result), null, 2);
-      } catch {
-        resultFormatted = entry.result || "(No result)";
+        const entry = JSON.parse(line);
+        let resultFormatted;
+        try {
+          resultFormatted = JSON.stringify(JSON.parse(entry.result), null, 2);
+        } catch {
+          resultFormatted = entry.result || "(No result)";
+        }
+        return `
+          <div class="entry">
+            <p><strong>${new Date(entry.timestamp).toLocaleString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true
+            })}</strong> | <code>${entry.type}</code> | <code>${entry.model}</code> | IP: ${entry.ip}</p>
+            <p><strong>${entry.type === "comment" ? "Comment" : "Prompt"}:</strong> ${entry.prompt}</p>
+            ${entry.type !== "comment" ? `
+              <details>
+                <summary><strong>Result (click to expand)</strong></summary>
+                <pre>${resultFormatted}</pre>
+              </details>
+            ` : ""}
+          </div>
+          <hr />
+        `;
+      } catch (e) {
+        return `<p>Error parsing line ${index + 1}</p>`;
       }
-      return `
-        <div class="entry">
-        <p><strong>${new Date(entry.timestamp).toLocaleString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        })}</strong> | <code>${entry.type}</code> | <code>${entry.model}</code> | IP: ${entry.ip}</p>
-        <p><strong>${entry.type === "comment" ? "Comment" : "Prompt"}:</strong> ${entry.prompt}</p>
-          ${entry.type !== "comment" ? `
-            <details>
-              <summary><strong>Result (click to expand)</strong></summary>
-              <pre>${resultFormatted}</pre>
-            </details>
-          ` : ""}
-        </div>
-        <hr />
-      `;
-    } catch (e) {
-      return `<p>Error parsing line ${index + 1}</p>`;
-    }
-  }).join('\n');
+    }).join('\n');
 
-  res.send(`
-    <html>
-      <head>
-        <title>Interaction Logs</title>
-        <style>
-          body {
-            font-family: sans-serif;
-            padding: 20px;
-            background: #f9f9f9;
-          }
-          .entry {
-            margin-bottom: 24px;
-          }
-          pre {
-            background: #eee;
-            padding: 10px;
-            border-radius: 6px;
-            overflow-x: auto;
-          }
-          summary {
-            cursor: pointer;
-            font-weight: bold;
-          }
-          code {
-            background: #e1e1e1;
-            padding: 2px 4px;
-            border-radius: 3px;
-          }
-        </style>
-      </head>
-      <body>
-        <h1>Interaction Logs</h1>
-        ${entries}
-      </body>
-    </html>
-  `);
-});
+    res.send(`
+      <html>
+        <head>
+          <title>Interaction Logs</title>
+          <style>
+            body {
+              font-family: sans-serif;
+              padding: 20px;
+              background: #f9f9f9;
+            }
+            .entry {
+              margin-bottom: 24px;
+            }
+            pre {
+              background: #eee;
+              padding: 10px;
+              border-radius: 6px;
+              overflow-x: auto;
+            }
+            summary {
+              cursor: pointer;
+              font-weight: bold;
+            }
+            code {
+              background: #e1e1e1;
+              padding: 2px 4px;
+              border-radius: 3px;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Interaction Logs</h1>
+          ${entries}
+        </body>
+      </html>
+    `);
+  });
+}

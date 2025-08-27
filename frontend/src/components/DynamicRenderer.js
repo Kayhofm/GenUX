@@ -376,14 +376,14 @@ function DynamicRenderer({ component, onContentGenerated }) {
       <Box
         sx={{
           display: 'flex',
-          alignItems: 'center',  // ✅ Change this to center vertically
+          alignItems: 'center',
           width: `${width}px`,
           margin: '10px 10px'
         }}
       >
         <Checkbox 
           {...props} 
-          sx={{ padding: '0 8px 0 0' }}  // ⬅️ Remove marginTop if not needed
+          sx={{ padding: '0 8px 0 0' }}
           checked={formValues[checkboxId] || false}
           onChange={(e) => handleInputChange(checkboxId, e.target.checked)}
         />
