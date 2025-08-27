@@ -12,7 +12,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
   const [comment, setComment] = useState("");
   const [commentStatus, setCommentStatus] = useState("");
   const [commentSubmitting, setCommentSubmitting] = useState(false);
-  const DEFAULT_PROMPT = "This is a new user. They are interested in seeing all your features. Please show off what you can do.";
+  const DEFAULT_PROMPT = "This is a new user interested in exploring your full capabilities. Please showcase a variety of features to demonstrate what you can do.";
   const hasRunInitialPrompt = useRef(false);
   const [showIntro, setShowIntro] = useState(true);
 
