@@ -91,7 +91,7 @@ fs.mkdirSync('./logs', { recursive: true }); // ensure the folder exists
 function logInteraction({ type, prompt, result, ip, model, id }) {
   const logEntry = {
     timestamp: new Date().toISOString(),
-    type, // "text" or "button"
+    type,
     prompt,
     result,
     model,
@@ -100,7 +100,14 @@ function logInteraction({ type, prompt, result, ip, model, id }) {
   };
 
   const logLine = JSON.stringify(logEntry) + '\n';
-  fs.appendFileSync(logFilePath, logLine);
+
+  if (process.env.NODE_ENV === "production") {
+    // ✅ Railway: use console.log so it shows up in Logs tab
+    console.log("INTERACTION_LOG:", logLine);
+  } else {
+    // ✅ Local dev: append to logs/interaction_logs.txt
+    fs.appendFileSync(logFilePath, logLine);
+  }
 }
 
 // Log all incoming requests
