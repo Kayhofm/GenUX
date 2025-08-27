@@ -356,13 +356,34 @@ function DynamicRenderer({ component, onContentGenerated }) {
         />
       </ListItem>;
     case "slider":
-      return <Slider
-        sx={{ width: `${width}px`, margin: '10px 10px' }}
-        defaultValue={props.content || 50}
-        min={props.min || 0}
-        max={props.max || 100}
-        onChangeCommitted={(e, value) => props.onChange && props.onChange(value)}
-      />;
+      const sliderId = props.ID || props.id;
+      return (
+        <Box
+          sx={{ 
+            width: `${width}px`, 
+            margin: '10px 10px', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'flex-start' 
+          }}
+          className={`${type} fade-in`}
+        >
+          <Typography
+            variant="body2"
+            color="text.primary"
+            sx={{ marginBottom: '4px', fontWeight: 500 }}
+          >
+            {props.content || "Slider"}
+          </Typography>
+          <Slider
+            value={formValues[sliderId] ?? props.value ?? 50}
+            onChangeCommitted={(e, value) => handleInputChange(sliderId, value)}
+            min={props.min || 0}
+            max={props.max || 100}
+            sx={{ width: '100%' }}
+          />
+        </Box>
+      );
     case "space":
       return <Box
         className={`${type} fade-in`}

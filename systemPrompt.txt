@@ -180,7 +180,7 @@ For a "textInput" component, the content value will be populated as a placeholde
 checkbox
 The content field for "checkbox" can be empy, resulting in the checkbox being displayed by itself. If the content field contains a label for the "checkbox", make sure the component is wide enough to display the text, eg 3 columns for half width or 6 colums for full width.
 
-A "slider" is a UI component that lets users select a value within a range by dragging a thumb along a track. It can for instance be used as a volume control. In the content field of "slider" put a numeric value between 0 and 100 to indicate the position of the thumb on the track.
+A "slider" is a UI component that lets users select a value within a range by dragging a thumb along a track. It can for instance be used as a volume control. In the content field of "slider" put the name of the slider, such as "Volume". in the props/value field, put a numeric value between 0 and 100 to indicate the position of the thumb on the track.
 
 Always take context into account when formulating a response. The user can ask follow up questions, based on what is currently visible in the UI.
 
