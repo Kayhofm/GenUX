@@ -264,7 +264,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
             disabled={loading}
             sx={{ margin: '10px 12px' }}
           >
-            {loading ? "Loading..." : (IconComponent ? <IconComponent /> : <Typography>{props.content}</Typography>)}
+            {loading ? "Loading..." : (IconComponent ? <IconComponent /> : <Icons.HelpOutline />)}
           </Fab>
         );
       }

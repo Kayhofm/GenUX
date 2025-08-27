@@ -19,10 +19,6 @@ import { generateImage, generateImageDalle, getImageStore, imageEventEmitter } f
 import { getAmazonProducts } from "./toolAmazon.js";
 import { getYelpBusinesses } from "./toolYelp.js";
 
-// const openai = new OpenAI({
-//   apiKey: process.env.OPENAI_API_KEY,
-// });
-
 let openai;
 
 if (process.env.OPENAI_API_KEY) {
@@ -100,14 +96,7 @@ function logInteraction({ type, prompt, result, ip, model, id }) {
   };
 
   const logLine = JSON.stringify(logEntry) + '\n';
-
-  if (process.env.NODE_ENV === "production") {
-    // ✅ Railway: use console.log so it shows up in Logs tab
-    console.log("INTERACTION_LOG:", logLine);
-  } else {
-    // ✅ Local dev: append to logs/interaction_logs.txt
-    fs.appendFileSync(logFilePath, logLine);
-  }
+  fs.appendFileSync(logFilePath, logLine);
 }
 
 // Log all incoming requests
@@ -629,7 +618,7 @@ app.post("/api/comment", (req, res) => {
     return res.status(400).json({ error: "Comment is required" });
   }
 
-  const logEntry = {
+  logInteraction({
     timestamp: new Date().toISOString(),
     type: "comment",
     prompt: comment,
@@ -637,14 +626,7 @@ app.post("/api/comment", (req, res) => {
     model: "",
     ip: req.ip,
     id: "comment"
-  };
-
-  if (process.env.NODE_ENV === "production") {
-    console.log("INTERACTION_LOG:", JSON.stringify(logEntry));
-  } else {
-    const logLine = JSON.stringify(logEntry) + '\n';
-    fs.appendFileSync(logFilePath, logLine);
-  }
+  });
 
   res.status(200).json({ success: true });
 });
@@ -657,7 +639,6 @@ app.listen(PORT, '0.0.0.0', () => {
 });
 
 // Logging webpage – only available in local development
-if (process.env.NODE_ENV !== "production") {
   app.get("/logs", (req, res) => {
     const content = fs.readFileSync(logFilePath, "utf8");
     const lines = content.trim().split('\n');
@@ -733,4 +714,3 @@ if (process.env.NODE_ENV !== "production") {
       </html>
     `);
   });
-}
