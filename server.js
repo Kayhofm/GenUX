@@ -190,6 +190,7 @@ const generateContent = async (prompt, res) => {
               if (Array.isArray(parsed)) {
                 parsed.forEach((item) => {
 
+                  /*
                       // image augmentation logic
                       if (item.type === "image" || item.type === "borderImage" || item.type === "list-item" || item.type === "avatar") {
                         if (typeof imgID === "undefined" || imgID === null) {
@@ -207,6 +208,32 @@ const generateContent = async (prompt, res) => {
                         } catch (error) {
                           console.error("Error generating image:", error.message);
                           item.props.imageSrc = "/img/default-image.png"; // fallback
+                        }
+                      }
+*/
+
+                      // image augmentation logic
+                      const needsImage = ["image", "borderImage", "list-item", "avatar"].includes(item.type);
+                      const content = item.props?.content || "missing content";
+                      const columns = item.props?.columns || 6;
+
+                      if (needsImage && typeof content === "string" && content.trim() !== "") {
+                        try {
+                          imgID = typeof imgID === "undefined" || imgID === null ? 1000 : imgID + 1;
+                          
+                          const imageUrl = generateImage(imgID, columns, content);
+
+                          // Only assign image if URL is returned
+                          if (imageUrl) {
+                            item.props.imageID = imgID;
+                            item.props.imageSrc = imageUrl;
+                          } else {
+                            console.warn("⚠️ generateImage returned empty for:", content);
+                            item.props.imageSrc = "/img/default-image.png";
+                          }
+                        } catch (error) {
+                          console.error("❌ Error generating image for:", content, error.message);
+                          item.props.imageSrc = "/img/default-image.png";
                         }
                       }
 
