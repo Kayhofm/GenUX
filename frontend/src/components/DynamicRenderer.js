@@ -367,10 +367,13 @@ function DynamicRenderer({ component, onContentGenerated }) {
         <Box
           sx={{ 
             width: `${width}px`, 
-            margin: '10px 10px', 
+            margin: '10px 10px',
+            backgroundColor: (theme) => theme.palette.grey[300],
+            borderRadius: '8px',
+            padding: '10px',
             display: 'flex', 
             flexDirection: 'column', 
-            alignItems: 'flex-start' 
+            alignItems: 'flex-start'
           }}
           className={`${type} fade-in`}
         >

@@ -128,7 +128,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
       setCommentStatus("❌ Error saving comment.");
     } finally {
       setCommentSubmitting(false);
-      setTimeout(() => setCommentStatus(""), 2000);
+      setTimeout(() => setCommentStatus(""), 9000);
     }
   };
 
