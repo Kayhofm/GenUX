@@ -18,6 +18,21 @@ function DynamicRenderer({ component, onContentGenerated }) {
     updateFormValue(id, value);
   };
 
+  const parseRichText = (text) => (
+    text.split('\n').map((line, i) => (
+      <React.Fragment key={i}>
+        {line.split(/(\*\*.*?\*\*)/).map((part, j) =>
+          part.startsWith('**') && part.endsWith('**') ? (
+            <strong key={j}>{part.slice(2, -2)}</strong>
+          ) : (
+            <React.Fragment key={j}>{part}</React.Fragment>
+          )
+        )}
+        {i < text.split('\n').length - 1 && <br />}
+      </React.Fragment>
+    ))
+  );
+
   const handleClick = () => {
     if (["button", "iconButton", "icon"].includes(component.type)) {
       const currentFormValues = getFormValues();
@@ -200,24 +215,28 @@ function DynamicRenderer({ component, onContentGenerated }) {
 
   switch (type) {
     case "header":
-      return <Typography
-        variant="h5"
-        color="text.primary"
-        className={`${type} fade-in`}
-        sx={{ width: `${width}px`, margin: '10px 10px' }}
-      >
-        {props.content}
-      </Typography>;
+      return (
+        <Typography
+          variant="h5"
+          color="text.primary"
+          className={`${type} fade-in`}
+          sx={{ width: `${width}px`, margin: '10px 10px' }}
+        >
+          {parseRichText(props.content)}
+        </Typography>
+      );
     case "subheader":
-      return <Typography
-        variant="body1" 
-        color="text.primary"
-        style={{ fontSize: '1.1rem', fontWeight: 500 }}
-        className={`${type} fade-in`}
-        sx={{ width: `${width}px`, margin: '0px 10px' }}
-      >
-        {props.content}
-      </Typography>;
+      return (
+        <Typography
+          variant="body1"
+          color="text.primary"
+          style={{ fontSize: '1.1rem', fontWeight: 500 }}
+          className={`${type} fade-in`}
+          sx={{ width: `${width}px`, margin: '0px 10px' }}
+        >
+          {parseRichText(props.content)}
+        </Typography>
+      );
     case "text":
       return (
         <Typography
@@ -226,17 +245,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
           className={`${type} fade-in`}
           sx={{ width: `${width}px`, margin: '4px 10px' }}
         >
-        {props.content.split('\n').map((line, i) => (
-          <React.Fragment key={i}>
-            {line.split(/(\*\*.*?\*\*)/).map((part, j) => {
-              if (part.startsWith('**') && part.endsWith('**')) {
-                return <strong key={j}>{part.slice(2, -2)}</strong>;
-              }
-              return <React.Fragment key={j}>{part}</React.Fragment>;
-            })}
-            {i < props.content.split('\n').length - 1 && <br />}
-          </React.Fragment>
-        ))}
+          {parseRichText(props.content)}
         </Typography>
       );
     case "button":
@@ -331,30 +340,27 @@ function DynamicRenderer({ component, onContentGenerated }) {
         onChange={(e) => handleInputChange(inputId, e.target.value)}
       />;
     case "list-item":
-      return <ListItem
-        className={`${type} fade-in`}
-        style={{ width: `${width}px`, margin: '10px 10px' , display: "flex" }}
-      >
-        <ListItemAvatar>
-          <Avatar
-            src={props.imageSrc || "/img/default-image.png"}
-            alt={""}
-            style={{ width: `40px` }}
+      return (
+        <ListItem
+          className={`${type} fade-in`}
+          style={{ width: `${width}px`, margin: '10px 10px', display: "flex" }}
+        >
+          <ListItemAvatar>
+            <Avatar
+              src={props.imageSrc || "/img/default-image.png"}
+              alt={""}
+              style={{ width: `40px` }}
+            />
+          </ListItemAvatar>
+          <ListItemText
+            primary={
+              <Typography color="text.primary">
+                {parseRichText(props.content)}
+              </Typography>
+            }
           />
-        </ListItemAvatar>
-        <ListItemText 
-          primary={
-            <Typography color="text.primary">
-              {props.content.split('\n').map((line, i) => (
-                <React.Fragment key={i}>
-                  {line}
-                  {i < props.content.split('\n').length - 1 && <br />}
-                </React.Fragment>
-              ))}
-            </Typography>
-          } 
-        />
-      </ListItem>;
+        </ListItem>
+      );
     case "slider":
       const sliderId = props.ID || props.id;
       return (
