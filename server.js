@@ -10,6 +10,7 @@ import { OpenAI } from "openai";
 import Anthropic from '@anthropic-ai/sdk';
 import fs from 'fs';
 import rateLimit from 'express-rate-limit';
+import nodemailer from 'nodemailer';
 
 // Fixed JSON imports - read files instead of using import with syntax
 const prompts = JSON.parse(fs.readFileSync('./prompts.json', 'utf8'));
@@ -104,6 +105,30 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+function sendEmailNotification(commentText, ipAddress) {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: process.env.EMAIL_TO,
+    subject: 'New Comment Received',
+    text: `New comment:\n\n${commentText}\n\nFrom IP: ${ipAddress}`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return console.error('Email error:', error);
+    }
+    console.log('✅ Email sent:', info.response);
+  });
+}
 
 const generateContent = async (prompt, res) => {
   if(!sessionMessages[9999]) {
@@ -627,6 +652,8 @@ app.post("/api/comment", (req, res) => {
     ip: req.ip,
     id: "comment"
   });
+
+  sendEmailNotification(comment, req.ip);
 
   res.status(200).json({ success: true });
 });
