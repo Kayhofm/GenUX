@@ -87,7 +87,10 @@ fs.mkdirSync('./logs', { recursive: true }); // ensure the folder exists
 // Create a reusable log function
 function logInteraction({ type, prompt, result, ip, model, id }) {
   const logEntry = {
-    timestamp: new Date().toISOString(),
+    timestamp: new Date().toLocaleString("en-US", { 
+      timeZone: "America/Los_Angeles", 
+      timeZoneName: "short" 
+    }),
     type,
     prompt,
     result,
