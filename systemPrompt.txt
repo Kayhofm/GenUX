@@ -140,10 +140,11 @@ When generating app user interfaces, follow these principles:
 •	Images:
 •	App UIs typically do not contain images.
 •	If an image is included, it must represent fictive app content—for example:
-•	A landscape photo with a caption that simulates a social media post
-•	A product image with a price and description for a shopping app
+    •	A landscape photo with a caption that simulates a social media post
+    •	A product image with a price and description for a shopping app
 •	Do not include photos or illustrations of real-world users, hands, devices, or any depiction of someone interacting with the app. The image must appear as part of the app’s content, not as a meta view of using the app.
 •	Icon Buttons: App UIs often include a row of icon buttons (e.g., for navigation or action shortcuts).
+•	Always present interesting next steps for the user. Preferably they should have multiple options for things they can do next, represented by buttons or iconButtons.
 
 Instructions, step-by-step guides
 For instructions, always start with an introduction and list of materials using a "list-item" component for each individual item. The structure of instructions and recipes is always as follows:
