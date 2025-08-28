@@ -386,7 +386,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
           </Typography>
           <Slider
             value={formValues[sliderId] ?? props.value ?? 50}
-            onChangeCommitted={(e, value) => handleInputChange(sliderId, value)}
+            onChange={(e, value) => handleInputChange(sliderId, value)}
             min={props.min || 0}
             max={props.max || 100}
             sx={{ width: '100%' }}
