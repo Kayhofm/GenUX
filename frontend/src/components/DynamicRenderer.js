@@ -228,11 +228,10 @@ function DynamicRenderer({ component, onContentGenerated }) {
     case "subheader":
       return (
         <Typography
-          variant="body1"
+          variant="subtitle1"
           color="text.primary"
-          style={{ fontSize: '1.1rem', fontWeight: 500 }}
           className={`${type} fade-in`}
-          sx={{ width: `${width}px`, margin: '0px 10px' }}
+          sx={{ width: `${width}px`, margin: '6px 10px' }}
         >
           {parseRichText(props.content)}
         </Typography>
@@ -281,15 +280,18 @@ function DynamicRenderer({ component, onContentGenerated }) {
       const iconName = props.content.charAt(0).toUpperCase() + props.content.slice(1);
       const IconComponent = Icons[iconName];
       return (
-        <IconButton
-          color="primary" // set the icon color ("secondary" if needed)
+        <Box
           className={`${type} fade-in`}
-          onClick={handleClick}
-          disabled={loading}
-          sx={{ margin: '10px 20px' }}
+          sx={{ width: `${width}px`, margin: '4px 10px', display: 'flex', justifyContent: 'center' }}
         >
-          {loading ? "Loading..." : IconComponent ? <IconComponent /> : <Typography>{props.content}</Typography>}
-        </IconButton>
+          <IconButton
+            color="primary"
+            onClick={handleClick}
+            disabled={loading}
+          >
+            {loading ? "Loading..." : IconComponent ? <IconComponent /> : <Typography>{props.content}</Typography>}
+          </IconButton>
+        </Box>
       );
     case "avatar":
       return <Avatar
