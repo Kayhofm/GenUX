@@ -343,21 +343,37 @@ function DynamicRenderer({ component, onContentGenerated }) {
       return (
         <ListItem
           className={`${type} fade-in`}
-          style={{ width: `${width}px`, margin: '10px 10px', display: "flex" }}
+          sx={{
+            width: `${width}px`,
+            margin: '4px 10px',
+            paddingY: '4px',
+            alignItems: 'center', // vertical centering
+          }}
         >
           <ListItemAvatar>
             <Avatar
               src={props.imageSrc || "/img/default-image.png"}
-              alt={""}
-              style={{ width: `40px` }}
+              alt=""
+              sx={{ width: 40, height: 40 }}
             />
           </ListItemAvatar>
           <ListItemText
             primary={
-              <Typography color="text.primary">
+              <Typography
+                color="text.primary"
+                variant="body2"
+                sx={{
+                  lineHeight: 1.3,
+                  display: 'inline-block',
+                  marginTop: '2px',
+                }}
+              >
                 {parseRichText(props.content)}
               </Typography>
             }
+            sx={{
+              margin: 0,
+            }}
           />
         </ListItem>
       );
