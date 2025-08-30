@@ -35,11 +35,12 @@ function App() {
   const handleContentGenerated = useCallback((newContent) => {
     setContent(newContent);
 
-    // Custom event for analytics
+    /* Custom event for analytics
     track('ui_generated', {
       componentCount: newContent.length,
       theme: newContent[0]?.theme || 'default',
     });
+    */
   }, []);
 
   return (

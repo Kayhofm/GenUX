@@ -1,18 +1,13 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { Typography, Button, Fab, Box, TextField, Avatar, ListItem, ListItemAvatar, ListItemText, IconButton, CardMedia, Slider, Checkbox, Switch, List } from '@mui/material';
 import * as Icons from '@mui/icons-material';
 import { useFormContext } from '../context/FormContext';
 import API_CONFIG from '../config/api';
-import { useImageEventStream } from '../hooks/useImageEventStream';
 
 function DynamicRenderer({ component, onContentGenerated }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { formValues, updateFormValue, getFormValues, clearFormValues } = useFormContext();
-
-  const { reconnectIfNeeded } = useImageEventStream((imageData) => {
-    onContentGenerated((prev) => [...prev, imageData]);
-  });
 
   const handleInputChange = (id, value) => {
     if (!id) {
@@ -40,9 +35,6 @@ function DynamicRenderer({ component, onContentGenerated }) {
 
   const handleClick = () => {
     if (["button", "iconButton", "icon"].includes(component.type)) {
-      // 🔁 Reconnect the image stream on user interaction
-      reconnectIfNeeded();
-
       const currentFormValues = getFormValues();
       console.log('Form values at click:', currentFormValues);
       
@@ -133,9 +125,6 @@ function DynamicRenderer({ component, onContentGenerated }) {
   };
 
   const handleFunction = () => {
-    // 🔁 Reconnect the image stream on user interaction
-    reconnectIfNeeded();
-
     if (component.type === "function") {
 
       setLoading(true);
