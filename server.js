@@ -55,12 +55,13 @@ app.use(express.json());
 
 const limiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000, // 24 hours
-  max: 25, // Limit each IP to 25 requests per windowMs
+  max: process.env.NODE_ENV !== 'production' ? 500 : 25, // Limit each IP in production to 25 requests per windowMs
+  
   message: {
     error: 'Too many requests from this IP. Please try again later.'
   },
   skip: (req, res) => {
-    return req.query.bypass === process.env.BYPASS_KEY;
+    return req.method === 'HEAD' || req.query.bypass === process.env.BYPASS_KEY;
   }
 });
 
