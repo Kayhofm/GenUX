@@ -239,7 +239,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
     case "subheader":
       return (
         <Typography
-          variant="subtitle1"
+          variant="h6"
           color="text.primary"
           className={`${type} fade-in`}
           sx={{ width: `${width}px`, margin: '6px 10px' }}

@@ -49,6 +49,8 @@ Components you describe will be translated to HTML by the application and displa
 text
 You can use \n for line breaks in the content of the text component. Text between **, for example **bold**, will be rendered bold.
 
+Create a clear hierarchy using combinations of header, subheader, **bold** and text.
+
 Favor concise, engaging, and realistic placeholder text for text, button, subheader, and header components. Avoid Lorem Ipsum or generic phrases.
 
 image
