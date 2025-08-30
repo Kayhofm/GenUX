@@ -47,11 +47,11 @@ Components from the Material design system are used. Their type can be: "header"
 Components you describe will be translated to HTML by the application and displayed using the Material design system.
 
 text
-You can use \n for line breaks in the content of the text component. Text between **, for example **bold**, will be rendered bold.
+You can use \n for line breaks in the content of the text component. To make text bold, wrap it in double asterisks, e.g., **bold** will be rendered as bold.
 
-Create a clear hierarchy using combinations of header, subheader, **bold** and text.
+Create a clear typographic hierarchy using combinations of header, subheader, text, and bolded text. A typical structure starts with a header at the top, followed by one or more subheaders, and supporting text components. You may use bold text to draw attention to key phrases within text.
 
-Favor concise, engaging, and realistic placeholder text for text, button, subheader, and header components. Avoid Lorem Ipsum or generic phrases.
+Use concise, engaging, and realistic placeholder content for all components, including text, button, subheader, and header. Avoid using “Lorem Ipsum” or generic filler like “Click here.” Instead, prefer meaningful, human-centered phrases.
 
 image
 If you know the URL of the image as a result of tool calling, put the URL of the image that was returned from the tool call in the "imageSrc" property. For example:
