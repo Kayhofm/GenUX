@@ -86,26 +86,7 @@ app.post("/api/set-model", (req, res) => {
 
 const logFilePath = './logs/interaction_logs.txt';
 fs.mkdirSync('./logs', { recursive: true }); // ensure the folder exists
-/*
-// Create a reusable log function
-function logInteraction({ type, prompt, result, ip, model, id }) {
-  const logEntry = {
-    timestamp: new Date().toLocaleString("en-US", { 
-      timeZone: "America/Los_Angeles", 
-      timeZoneName: "short" 
-    }),
-    type,
-    prompt,
-    result,
-    model,
-    ip,
-    id
-  };
 
-  const logLine = JSON.stringify(logEntry) + '\n';
-  fs.appendFileSync(logFilePath, logLine);
-}
-*/
 // Log all incoming requests
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
@@ -185,107 +166,6 @@ const generateContent = async (prompt, res) => {
       return;
     }
 
-    /*
-    if (currentModel.startsWith("claude")) {
-      try {
-        console.log("🟣 Claude block triggered");
-        res.setHeader("Content-Type", "text/event-stream");
-        res.setHeader("Cache-Control", "no-cache");
-        res.setHeader("Connection", "keep-alive");
-
-      const stream = await anthropic.messages.stream({
-        model: currentModel,
-        max_tokens: 2048,
-        system: systemPrompt01,
-        messages: messageList,
-      });
-        console.log("🟢 Claude stream opened");
-
-        let buffer = "";
-        let fullMessage = "";
-
-        for await (const message of stream) {
-          const delta = message.delta?.text;
-          // console.log("📨 Claude chunk:", delta);
-
-          if (delta) {
-            buffer += delta;
-            fullMessage += delta;
-
-            // Try to parse buffer
-            let tempBuffer = buffer;
-
-            if (tempBuffer.startsWith("[")) tempBuffer = tempBuffer.slice(1);
-            if (tempBuffer.endsWith("]")) tempBuffer = tempBuffer.slice(0, -1);
-            if (tempBuffer.endsWith(",")) tempBuffer = tempBuffer.slice(0, -1);
-
-            tempBuffer = `[${tempBuffer}]`;
-
-            try {
-              const parsed = JSON.parse(tempBuffer);
-              if (Array.isArray(parsed)) {
-                parsed.forEach((item) => {
-
-                      // image augmentation logic
-                      const needsImage = ["image", "borderImage", "list-item", "avatar"].includes(item.type);
-                      const content = item.props?.content || "missing content";
-                      const columns = item.props?.columns || 6;
-
-                      if (needsImage && typeof content === "string" && content.trim() !== "") {
-                        try {
-                          imgID = typeof imgID === "undefined" || imgID === null ? 1000 : imgID + 1;
-                          
-                          const imageUrl = generateImage(imgID, columns, content);
-
-                          // Only assign image if URL is returned
-                          if (imageUrl) {
-                            item.props.imageID = imgID;
-                            item.props.imageSrc = imageUrl;
-                          } else {
-                            console.warn("⚠️ generateImage returned empty for:", content);
-                            item.props.imageSrc = "/img/default-image.png";
-                          }
-                        } catch (error) {
-                          console.error("❌ Error generating image for:", content, error.message);
-                          item.props.imageSrc = "/img/default-image.png";
-                        }
-                      }
-
-                  res.write(`data: ${JSON.stringify(item)}\n\n`);
-                });
-                buffer = ""; // reset after flush
-              }
-            } catch (e) {
-              // Continue accumulating
-            }
-          }
-        }
-
-        res.write("data: [DONE]\n\n");
-        res.end();
-
-        logInteraction({
-          type: "text",
-          prompt,
-          result: fullMessage,
-          model: currentModel,
-          ip: res.req.ip,
-          id: sessionId
-        });
-
-        sessionMessages[sessionId + 1] = [
-          { role: "user", content: userPrompt01 + prompt },
-          { role: "assistant", content: fullMessage }
-        ];
-        
-        return;
-      } catch (error) {
-        console.error("Claude Streaming Error:", error.message);
-        res.status(500).json({ error: "Failed to generate content with Claude." });
-        return;
-      }
-    }
-*/
     const response = await openai.chat.completions.create({
       model: currentModel,
       messages: [
