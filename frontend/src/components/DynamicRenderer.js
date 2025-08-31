@@ -184,12 +184,47 @@ function DynamicRenderer({ component, onContentGenerated }) {
 
   switch (type) {
     case "header":
-      return <Typography variant="h5" sx={{ width, m: '10px' }}>{parseRichText(props.content)}</Typography>;
+      return (
+        <Typography
+          variant="h5"
+          sx={{
+            width,
+            m: '10px',
+            textAlign: 'left'
+          }}
+        >
+          {parseRichText(props.content)}
+        </Typography>
+      );
+
     case "subheader":
-      return <Typography variant="h6" sx={{ width, m: '6px 10px' }}>{parseRichText(props.content)}</Typography>;
+      return (
+        <Typography
+          variant="h6"
+          sx={{
+            width,
+            m: '6px 10px',
+            textAlign: 'left'
+          }}
+        >
+          {parseRichText(props.content)}
+        </Typography>
+      );
+
     case "text":
-      return <Typography variant="body1" sx={{ width, m: '4px 10px' }}>{parseRichText(props.content)}</Typography>;
-    case "button":
+      return (
+        <Typography
+          variant="body1"
+          sx={{
+            width,
+            m: '4px 10px',
+            textAlign: 'left'
+          }}
+        >
+          {parseRichText(props.content)}
+        </Typography>
+      );
+      case "button":
       return <Button variant="contained" color={props.variant === "secondary" ? "secondary" : "primary"} sx={{ width, m: '10px', maxHeight: '61px' }} onClick={handleClick} disabled={loading}>{loading ? "Loading..." : props.content}</Button>;
     case "iconButton": {
       const iconName = props.content.charAt(0).toUpperCase() + props.content.slice(1);
@@ -232,7 +267,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
           <ListItemAvatar>
             <Avatar src={typeof props.imageSrc === 'string' ? props.imageSrc : "/img/default-image.png"} alt="" sx={{ width: 40, height: 40 }} />
           </ListItemAvatar>
-          <ListItemText primary={<Typography variant="body2" sx={{ lineHeight: 1.3, mt: '2px' }}>{parseRichText(props.content)}</Typography>} sx={{ m: 0 }} />
+          <ListItemText primary={<Typography variant="body1" sx={{ lineHeight: 1.3, mt: '2px' }}>{parseRichText(props.content)}</Typography>} sx={{ m: 0 }} />
         </ListItem>
       );
     case "slider": {

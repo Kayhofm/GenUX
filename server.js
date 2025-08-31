@@ -83,10 +83,10 @@ app.post("/api/set-model", (req, res) => {
   console.log("Model updated to:", model);
   res.json({ success: true, model });
 });
-/*
+
 const logFilePath = './logs/interaction_logs.txt';
 fs.mkdirSync('./logs', { recursive: true }); // ensure the folder exists
-
+/*
 // Create a reusable log function
 function logInteraction({ type, prompt, result, ip, model, id }) {
   const logEntry = {
