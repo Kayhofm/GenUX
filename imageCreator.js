@@ -69,7 +69,10 @@ const generateImageDalle = async (imgID, columns, prompt) => {
     // Emit an event to notify listeners
     imageEventEmitter.emit("newImage", imageUrl, imgID);
 
-    return imageUrl;
+    console.log("✅ Image URL:", imageUrl, typeof imageUrl);
+
+    // return imageUrl;
+    return typeof imageUrl === "string" ? imageUrl : "/img/default-image.png";
   } catch (error) {
     console.error("Error generating image:", error.message);
     throw new Error("Failed to generate image");

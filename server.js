@@ -11,6 +11,8 @@ import Anthropic from '@anthropic-ai/sdk';
 import fs from 'fs';
 import rateLimit from 'express-rate-limit';
 import nodemailer from 'nodemailer';
+import { logInteraction } from './logService.js';
+import { streamClaudeResponse } from './anthropicService.js';
 
 // Fixed JSON imports - read files instead of using import with syntax
 const prompts = JSON.parse(fs.readFileSync('./prompts.json', 'utf8'));
@@ -81,7 +83,7 @@ app.post("/api/set-model", (req, res) => {
   console.log("Model updated to:", model);
   res.json({ success: true, model });
 });
-
+/*
 const logFilePath = './logs/interaction_logs.txt';
 fs.mkdirSync('./logs', { recursive: true }); // ensure the folder exists
 
@@ -103,7 +105,7 @@ function logInteraction({ type, prompt, result, ip, model, id }) {
   const logLine = JSON.stringify(logEntry) + '\n';
   fs.appendFileSync(logFilePath, logLine);
 }
-
+*/
 // Log all incoming requests
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
@@ -168,6 +170,22 @@ const generateContent = async (prompt, res) => {
 
     console.log("▶ Calling LLM with model:", currentModel);
 
+    if (currentModel.startsWith("claude")) {
+      await streamClaudeResponse({
+        model: currentModel,
+        prompt,
+        userPrompt01,
+        systemPrompt: systemPrompt01,
+        messageList,
+        sessionId,
+        res,
+        sessionMessages,
+        imgIDRef: { current: 1000 },
+      });
+      return;
+    }
+
+    /*
     if (currentModel.startsWith("claude")) {
       try {
         console.log("🟣 Claude block triggered");
@@ -267,7 +285,7 @@ const generateContent = async (prompt, res) => {
         return;
       }
     }
-
+*/
     const response = await openai.chat.completions.create({
       model: currentModel,
       messages: [

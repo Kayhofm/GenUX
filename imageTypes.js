@@ -1,0 +1,1 @@
+export const needsImageTypes = ["image", "borderImage", "list-item", "avatar"];
