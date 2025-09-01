@@ -299,11 +299,6 @@ function DynamicRenderer({ component, onContentGenerated }) {
         </Box>
       );
     }
-    case "remove":
-      if (props.ID) {
-        onContentGenerated(prev => prev.filter(item => item.props?.ID !== props.ID));
-      }
-      return null;
     default:
       return <Typography variant="body1">Unsupported component type: {type}</Typography>;
   }

@@ -47,6 +47,8 @@ export async function streamClaudeResponse({
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Connection", "keep-alive");
 
+        // console.log("🛠️ Available tools:", JSON.stringify([yelpTool], null, 2));
+
         // Start with streaming immediately
         const stream = await anthropic.messages.stream({
             model,
@@ -76,7 +78,7 @@ export async function streamClaudeResponse({
                 
                 // Clear any content that was streamed before the tool call
                 res.write(`data: ${JSON.stringify({
-                    type: "clear_all"
+                    type: "tool_starting"
                 })}\n\n`);
                 
                 continue;

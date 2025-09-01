@@ -40,6 +40,13 @@ export async function streamOpenAIContent(prompt, onData, bypassKey = null) {
       } else {
         try {
           const jsonData = JSON.parse(event.data);
+
+          // Handle tool_starting message - clear all content like button clicks do
+          if (jsonData.type === 'tool_starting') {
+            onData([]); // Clear all content by calling onContentGenerated([])
+            return;
+          }
+
           onData(jsonData);
         } catch (err) {
           console.error("Invalid JSON data:", event.data);

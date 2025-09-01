@@ -31,16 +31,31 @@ function App() {
     }
   }, [content]);
 
-  // Handle content generation from ControlPanel
   const handleContentGenerated = useCallback((newContent) => {
-    setContent(newContent);
-
-    /* Custom event for analytics
-    track('ui_generated', {
-      componentCount: newContent.length,
-      theme: newContent[0]?.theme || 'default',
-    });
-    */
+    if (Array.isArray(newContent) && newContent.length === 0) {
+      // Clear all content (empty array)
+      setContent([]);
+    } else if (typeof newContent === 'function') {
+      // Handle function updates (prev) => [...prev, newItem]
+      setContent(prevContent => {
+        const result = newContent(prevContent);
+        // Filter out any remove types that might have been added
+        return result.filter(item => item.type !== 'remove');
+      });
+    } else if (Array.isArray(newContent)) {
+      // Handle array updates - this shouldn't happen in streaming, but just in case
+      setContent(newContent.filter(item => item.type !== 'remove'));
+    } else {
+      // Handle single item updates from streaming
+      if (newContent.type === "remove" && newContent.props?.ID) {
+        // Remove item with matching ID
+        setContent(prev => prev.filter(existing => existing.props?.ID !== newContent.props.ID));
+      } else if (newContent.type !== "remove") {
+        // Add non-remove items
+        setContent(prev => [...prev, newContent]);
+      }
+      // If it's a remove type without proper ID, ignore it
+    }
   }, []);
 
   return (
