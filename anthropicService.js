@@ -69,17 +69,18 @@ export async function streamClaudeResponse({
         for await (const message of stream) {
             // Handle tool use start
             if (message.type === "content_block_start" && message.content_block?.type === "tool_use") {
+
+                // Clear any content that was streamed before the tool call
+                res.write(`data: ${JSON.stringify({
+                    type: "tool_starting"
+                })}\n\n`);
+
                 pendingToolUse = {
                     id: message.content_block.id,
                     name: message.content_block.name
                 };
                 toolInput = "";
                 console.log("🛠️ Tool call starting:", pendingToolUse.name);
-                
-                // Clear any content that was streamed before the tool call
-                res.write(`data: ${JSON.stringify({
-                    type: "tool_starting"
-                })}\n\n`);
                 
                 continue;
             }
@@ -141,6 +142,8 @@ export async function streamClaudeResponse({
                                             type: "tool_result",
                                             tool_use_id: pendingToolUse.id,
                                             content: `Generate UI components with these Yelp businesses: ${JSON.stringify(yelpResult.results)}`
+                                            // content: `Current UI already shows: "${fullMessage}". Use that existing UI and don't send components to render it again. Now generate UI components with these Yelp businesses, replacing or updating the existing content appropriately: ${JSON.stringify(yelpResult.results)}`
+
                                         }
                                     ]
                                 }

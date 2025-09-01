@@ -41,8 +41,12 @@ export async function streamOpenAIContent(prompt, onData, bypassKey = null) {
         try {
           const jsonData = JSON.parse(event.data);
 
+          console.log("Received message:", jsonData);
+
+
           // Handle tool_starting message - clear all content like button clicks do
           if (jsonData.type === 'tool_starting') {
+            console.log("🧹 Clearing content due to tool_starting");
             onData([]); // Clear all content by calling onContentGenerated([])
             return;
           }
