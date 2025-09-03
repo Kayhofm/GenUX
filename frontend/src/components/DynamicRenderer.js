@@ -224,8 +224,32 @@ function DynamicRenderer({ component, onContentGenerated }) {
           {parseRichText(props.content)}
         </Typography>
       );
-      case "button":
-      return <Button variant="contained" color={props.variant === "secondary" ? "secondary" : "primary"} sx={{ width, m: '10px', maxHeight: '61px' }} onClick={handleClick} disabled={loading}>{loading ? "Loading..." : props.content}</Button>;
+      case "button": {
+      const isOneCol = String(props.columns) === '1';
+      return (
+        <Button
+          variant="contained"
+          color={props.variant === "secondary" ? "secondary" : "primary"}
+          size={isOneCol ? "small" : "medium"}
+          sx={{
+            width,
+            boxSizing: 'border-box',
+            minWidth: 0,
+            px: isOneCol ? 0.5 : undefined,
+            py: isOneCol ? 0.5 : undefined,
+            maxHeight: '61px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            m: '10px'
+          }}
+          onClick={handleClick}
+          disabled={loading}
+        >
+          {loading ? "Loading..." : props.content}
+        </Button>
+      );
+    }
     case "iconButton": {
       const iconName = props.content.charAt(0).toUpperCase() + props.content.slice(1);
       const IconComponent = Icons[iconName];
