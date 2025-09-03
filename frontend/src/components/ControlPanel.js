@@ -146,7 +146,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
       {/* One-time message */}
       {showIntro && (
         <div style={{ marginTop: '8px', marginBottom: '16px', color: '#555', textAlign: 'left'  }}>
-          This prompt was rendered in the panel on the right by the AI listed in the model dropdown. Feel free to interact with the UI or input your own prompt. For instance, try a variation of these prompts in the input field below: "I want to cook lasagna", "Teach me how to play guitar", or "Pay my utility bill".
+          This prompt was rendered in the panel on the right by the AI listed in the model dropdown. Feel free to interact with the UI or input your own prompt. For instance, try a variation of these prompts in the input field below: "I want to cook lasagna", "Teach me how to play guitar", "Pay my utility bill", or "Use Yelp to find coffee shops in Seattle".
         </div>
       )}
 

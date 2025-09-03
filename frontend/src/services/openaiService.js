@@ -1,6 +1,6 @@
 import API_CONFIG from '../config/api';
 
-export async function streamOpenAIContent(prompt, onData, bypassKey = null) {
+export async function streamOpenAIContent(prompt, onData, bypassKey = null, options = {}) {
   // ✅ Use backticks for template literal
   let API_URL = `${API_CONFIG.BASE_URL}/api/generate?prompt=${encodeURIComponent(prompt)}`;
 
@@ -30,30 +30,63 @@ export async function streamOpenAIContent(prompt, onData, bypassKey = null) {
     throw new Error("Network error. Please try again.");
   }
 
-  return new Promise((resolve, reject) => {
-    const eventSource = new EventSource(API_URL);
+  const {
+    retries = 1,
+    retryDelayMs = 500,
+    jitterMs = 300,
+  } = options;
 
-    eventSource.onmessage = (event) => {
-      if (event.data === "[DONE]") {
-        eventSource.close();
-        resolve();
-      } else {
+  return new Promise((resolve, reject) => {
+    let attemptsLeft = retries;
+    let eventSource;
+
+    const scheduleRetry = () => {
+      if (attemptsLeft > 0) {
+        const delay = retryDelayMs + Math.floor(Math.random() * jitterMs);
+        attemptsLeft -= 1;
+        setTimeout(connect, delay);
+        return true;
+      }
+      return false;
+    };
+
+    const connect = () => {
+      eventSource = new EventSource(API_URL);
+
+      eventSource.onmessage = (event) => {
+        if (event.data === "[DONE]") {
+          eventSource.close();
+          resolve();
+          return;
+        }
+
         try {
           const jsonData = JSON.parse(event.data);
 
           console.log("Received message:", jsonData);
 
+          // Handle explicit server-side error payloads
+          if (jsonData.type === 'error') {
+            // Surface the error to the UI, then close and retry gracefully
+            onData(jsonData);
+            eventSource.close();
+            if (!scheduleRetry()) {
+              reject(new Error(jsonData.message || "Streaming failed. Please try again."));
+            }
+            return;
+          }
+
           // Handle clear message from server
           if (jsonData.type === 'clear') {
             console.log("🧹 Clearing content due to clear message");
-            onData([]); // Clear all content
+            onData([]);
             return;
           }
 
           // Handle tool_starting message - clear all content like button clicks do
           if (jsonData.type === 'tool_starting') {
             console.log("🧹 Clearing content due to tool_starting");
-            onData([]); // Clear all content by calling onContentGenerated([])
+            onData([]);
             return;
           }
 
@@ -61,13 +94,17 @@ export async function streamOpenAIContent(prompt, onData, bypassKey = null) {
         } catch (err) {
           console.error("Invalid JSON data:", event.data);
         }
-      }
+      };
+
+      eventSource.onerror = (error) => {
+        console.error("Stream error:", error);
+        eventSource.close();
+        if (!scheduleRetry()) {
+          reject(new Error("Streaming failed. Please try again."));
+        }
+      };
     };
 
-    eventSource.onerror = (error) => {
-      console.error("Stream error:", error);
-      eventSource.close();
-      reject(new Error("Streaming failed. Please try again."));
-    };
+    connect();
   });
 }

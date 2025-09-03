@@ -64,11 +64,15 @@ export async function streamClaudeResponse({
         let fullMessage = "";
         let pendingToolUse = null;
         let toolInput = "";
+        let sawToolUse = false; // Track whether the model initiated any tool_use
+        let parseWarnedMain = false; // Log JSON parse gate once per request (main stream)
+        const mainStats = { emitted: 0 }; // Count components dispatched in main stream
         imgIDRef.current = imgIDRef.current || 1000;
 
         for await (const message of stream) {
             // Handle tool use start
             if (message.type === "content_block_start" && message.content_block?.type === "tool_use") {
+                sawToolUse = true;
 
                 // Send loading message
                 res.write(`data: ${JSON.stringify({
@@ -160,9 +164,11 @@ export async function streamClaudeResponse({
                                 system: systemPrompt,
                                 messages: followUpMessages,
                             });
-
-                            // Process follow-up stream
-                            await processStream(followUpStream, res, imgIDRef);
+                            console.log("🔁 Follow-up stream starting (Yelp results) for session:", sessionId);
+                            // Process follow-up stream with stats for logging
+                            const followUpStats = { emitted: 0 };
+                            await processStream(followUpStream, res, imgIDRef, followUpStats);
+                            console.log("🔁 Follow-up stream completed. Components dispatched:", followUpStats.emitted, "session:", sessionId);
 
                         } catch (toolError) {
                             console.error("❌ Yelp tool error:", toolError.message);
@@ -210,16 +216,25 @@ export async function streamClaudeResponse({
                     try {
                         const parsed = JSON.parse(tempBuffer);
                         if (Array.isArray(parsed)) {
-                            processComponents(parsed, res, imgIDRef);
+                            processComponents(parsed, res, imgIDRef, mainStats);
                             buffer = ""; // Reset buffer after successful parse
                         }
                     } catch (err) {
+                        if (!parseWarnedMain) {
+                            console.warn("⏳ Main stream JSON not yet complete; accumulating… session:", sessionId);
+                            parseWarnedMain = true;
+                        }
                         // Incomplete JSON, keep accumulating
                     }
                 }
             }
         }
 
+        if (!sawToolUse) {
+            console.log("ℹ️ No tool_use observed; main stream completed. Session:", sessionId, "components:", mainStats.emitted);
+        }
+
+        console.log("📤 Sending [DONE]. Session:", sessionId, "components:", mainStats.emitted, "tool_used:", sawToolUse);
         res.write("data: [DONE]\n\n");
         res.end();
 
@@ -243,6 +258,8 @@ export async function streamClaudeResponse({
 
         if (!res.headersSent) {
             try {
+                // Explicit log for overload path to aid diagnosis
+                console.warn("🟥 Sending overload SSE error to client (Claude overloaded). Session:", sessionId);
                 res.write(`data: ${JSON.stringify({ type: "error", message: "Claude overloaded" })}\n\n`);
                 res.end();
             } catch (writeErr) {
@@ -257,6 +274,7 @@ export async function streamClaudeResponse({
 // Helper function to process streaming responses
 async function processStream(stream, res, imgIDRef) {
     let buffer = "";
+    let parseWarnedFollowUp = false;
     
     for await (const message of stream) {
         if (message.type === "content_block_delta" && message.delta?.type === "text_delta") {
@@ -275,10 +293,15 @@ async function processStream(stream, res, imgIDRef) {
                 try {
                     const parsed = JSON.parse(tempBuffer);
                     if (Array.isArray(parsed)) {
-                        processComponents(parsed, res, imgIDRef);
+                        // stats arg is optional for backwards-compat
+                        processComponents(parsed, res, imgIDRef, arguments[3]);
                         buffer = "";
                     }
                 } catch (err) {
+                    if (!parseWarnedFollowUp) {
+                        console.warn("⏳ Follow-up stream JSON not yet complete; accumulating…");
+                        parseWarnedFollowUp = true;
+                    }
                     // Incomplete JSON, keep accumulating
                 }
             }
@@ -287,7 +310,7 @@ async function processStream(stream, res, imgIDRef) {
 }
 
 // Helper function to process UI components
-function processComponents(components, res, imgIDRef) {
+function processComponents(components, res, imgIDRef, stats) {
     components.forEach(item => {
         const needsImage = needsImageTypes.includes(item.type);
         const content = item.props?.content || "missing content";
@@ -305,6 +328,12 @@ function processComponents(components, res, imgIDRef) {
             }
         }
 
+        // Count for diagnostics
+        if (stats && typeof stats.emitted === 'number') {
+            stats.emitted += 1;
+        }
+
+        console.log("🧩 Dispatching component:", item.type, item.props?.ID || "no-id");
         res.write(`data: ${JSON.stringify(item)}\n\n`);
     });
 }
