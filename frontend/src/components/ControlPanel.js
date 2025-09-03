@@ -49,8 +49,10 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
       setLoading(true);
       onContentGenerated([]); // Clear previous content
 
+      // Pass through streamed items directly so handlers can process
+      // special messages like {type: 'clear'} correctly
       streamOpenAIContent(DEFAULT_PROMPT, (data) => {
-        onContentGenerated((prev) => [...prev, data]);
+        onContentGenerated(data);
       }, bypassKey)
         .catch((err) => {
           console.error("Initial generation failed:", err);
@@ -92,8 +94,9 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
     setError(null);
     onContentGenerated([]); // Clear previous content
 
+    // Pass through streamed items directly so App handler can append/clear
     streamOpenAIContent(prompt, (data) => {
-      onContentGenerated((prev) => [...prev, data]); // Append received components
+      onContentGenerated(data);
     }, bypassKey)
       .catch((err) => {
         if (err.code === 429) {

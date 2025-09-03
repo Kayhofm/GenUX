@@ -32,29 +32,28 @@ function App() {
   }, [content]);
 
   const handleContentGenerated = useCallback((newContent) => {
-    if (Array.isArray(newContent) && newContent.length === 0) {
+    console.log("🧹 Received new content: ", newContent.type);
+    // Clear on explicit "clear" message
+    if (newContent && newContent.type === "clear") {
+      console.log("🧹 Received clear message: ", newContent.type);
+      setContent([]);
+    } else if (Array.isArray(newContent) && newContent.length === 0) {
       // Clear all content (empty array)
       setContent([]);
     } else if (typeof newContent === 'function') {
-      // Handle function updates (prev) => [...prev, newItem]
       setContent(prevContent => {
         const result = newContent(prevContent);
-        // Filter out any remove types that might have been added
         return result.filter(item => item.type !== 'remove');
       });
     } else if (Array.isArray(newContent)) {
-      // Handle array updates - this shouldn't happen in streaming, but just in case
       setContent(newContent.filter(item => item.type !== 'remove'));
     } else {
       // Handle single item updates from streaming
       if (newContent.type === "remove" && newContent.props?.ID) {
-        // Remove item with matching ID
         setContent(prev => prev.filter(existing => existing.props?.ID !== newContent.props.ID));
       } else if (newContent.type !== "remove") {
-        // Add non-remove items
         setContent(prev => [...prev, newContent]);
       }
-      // If it's a remove type without proper ID, ignore it
     }
   }, []);
 

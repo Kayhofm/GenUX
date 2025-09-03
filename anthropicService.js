@@ -70,9 +70,14 @@ export async function streamClaudeResponse({
             // Handle tool use start
             if (message.type === "content_block_start" && message.content_block?.type === "tool_use") {
 
-                // Clear any content that was streamed before the tool call
+                // Send loading message
                 res.write(`data: ${JSON.stringify({
-                    type: "tool_starting"
+                    type: "text",
+                    props: {
+                        content: "🔍 Searching Yelp for local businesses...",
+                        ID: "loading-yelp",
+                        columns: "6"
+                    }
                 })}\n\n`);
 
                 pendingToolUse = {
@@ -100,15 +105,13 @@ export async function streamClaudeResponse({
                     console.log("🛠️ Tool call complete:", pendingToolUse.name, input);
 
                     if (pendingToolUse.name === "get_yelp_businesses") {
-                        // Send loading message
+
+                        // Clear any content that was streamed before the tool call
+                        console.log("🧹 Clearing previous content before tool results");
                         res.write(`data: ${JSON.stringify({
-                            type: "text",
-                            props: {
-                                content: "🔍 Searching Yelp for local businesses...",
-                                ID: "loading-yelp",
-                                columns: "6"
-                            }
+                            type: "clear"
                         })}\n\n`);
+                         if (res.flush) res.flush();
 
                         try {
                             const yelpResult = await getYelpBusinesses(input.query, input.location);
@@ -119,6 +122,7 @@ export async function streamClaudeResponse({
                                 type: "remove",
                                 props: { ID: "loading-yelp" }
                             })}\n\n`);
+                            if (res.flush) res.flush();
 
                             // Continue with follow-up stream
                             const followUpMessages = [

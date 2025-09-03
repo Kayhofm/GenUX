@@ -93,7 +93,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
                   try {
                     if (jsonData === "[DONE]") return;
                     const parsedData = JSON.parse(jsonData);
-                    onContentGenerated((prev) => [...prev, parsedData]);
+                    onContentGenerated(parsedData);
                   } catch (error) {
                     console.error("Error parsing streamed data:", error);
                   }
@@ -152,7 +152,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
                   try {
                     if (jsonData === "[DONE]") return;
                     const parsedData = JSON.parse(jsonData);
-                    onContentGenerated((prev) => [...prev, parsedData]);
+                    onContentGenerated(parsedData);
                   } catch (error) {
                     console.error("Error parsing streamed data:", error);
                   }

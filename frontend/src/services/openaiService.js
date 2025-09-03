@@ -43,6 +43,12 @@ export async function streamOpenAIContent(prompt, onData, bypassKey = null) {
 
           console.log("Received message:", jsonData);
 
+          // Handle clear message from server
+          if (jsonData.type === 'clear') {
+            console.log("🧹 Clearing content due to clear message");
+            onData([]); // Clear all content
+            return;
+          }
 
           // Handle tool_starting message - clear all content like button clicks do
           if (jsonData.type === 'tool_starting') {
