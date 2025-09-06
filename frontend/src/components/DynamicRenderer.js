@@ -331,7 +331,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
       return (
         <Box sx={{ display: 'flex', alignItems: 'center', width, boxSizing: 'border-box', minWidth: 0, m: '10px' }}>
           <Switch checked={formValues[switchId] || false} onChange={(e) => handleInputChange(switchId, e.target.checked)} />
-          <Typography variant="body1" sx={{ ml: 1 }}>{props.content}</Typography>
+          <Typography variant="body1" sx={{ ml: 1, textAlign: 'left', whiteSpace: 'normal', wordBreak: 'break-word' }}>{props.content}</Typography>
         </Box>
       );
     }
