@@ -238,7 +238,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
             px: isOneCol ? 0.5 : undefined,
             py: isOneCol ? 0.5 : undefined,
             maxHeight: '61px',
-            whiteSpace: 'nowrap',
+            // whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             m: '10px'
@@ -296,10 +296,22 @@ function DynamicRenderer({ component, onContentGenerated }) {
       );
     case "slider": {
       const sliderId = props.ID || props.id;
+      const minVal = props.min ?? 0;
+      const maxVal = props.max ?? 100;
       return (
-        <Box sx={{ width, m: '10px', backgroundColor: (theme) => theme.palette.grey[300], borderRadius: '8px', p: '10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+        <Box sx={{ width, boxSizing: 'border-box', minWidth: 0, m: '10px', backgroundColor: (theme) => theme.palette.grey[300], borderRadius: '8px', p: '10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
           <Typography variant="body2" sx={{ mb: '4px', fontWeight: 500 }}>{props.content || "Slider"}</Typography>
-          <Slider value={formValues[sliderId] ?? props.value ?? 50} onChange={(e, value) => handleInputChange(sliderId, value)} min={props.min || 0} max={props.max || 100} sx={{ width: '100%' }} />
+          <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', minWidth: 0 }}>
+            <Typography variant="caption" sx={{ mr: 1 }}>{minVal}</Typography>
+            <Slider
+              value={formValues[sliderId] ?? props.value ?? 50}
+              onChange={(e, value) => handleInputChange(sliderId, value)}
+              min={minVal}
+              max={maxVal}
+              sx={{ flex: 1, mx: 1 }}
+            />
+            <Typography variant="caption" sx={{ ml: 1 }}>{maxVal}</Typography>
+          </Box>
         </Box>
       );
     }
@@ -317,7 +329,7 @@ function DynamicRenderer({ component, onContentGenerated }) {
     case "switch": {
       const switchId = props.ID || props.id;
       return (
-        <Box sx={{ display: 'flex', alignItems: 'center', width, m: '10px' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', width, boxSizing: 'border-box', minWidth: 0, m: '10px' }}>
           <Switch checked={formValues[switchId] || false} onChange={(e) => handleInputChange(switchId, e.target.checked)} />
           <Typography variant="body1" sx={{ ml: 1 }}>{props.content}</Typography>
         </Box>
