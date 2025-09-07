@@ -62,7 +62,10 @@ function App() {
       <ThemeProvider theme={currentTheme}>
         <div className="App">
           <header className="App-header">
-            <h1>Generative UX</h1>
+            <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 4 }}>
+              <Typography variant="h4" component="h1">Generative UX</Typography>
+              <Typography variant="subtitle1" component="span" sx={{ opacity: 0.85 }}>Kay Hofmeester</Typography>
+            </Box>
           </header>
           <main className="App-main">
             <section className="Control-panel-section">

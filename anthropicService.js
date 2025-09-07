@@ -121,13 +121,14 @@ export async function streamClaudeResponse({
                             const yelpResult = await getYelpBusinesses(input.query, input.location);
                             console.log("✅ Yelp results:", yelpResult.results.length, "businesses found");
 
-                            // Remove loading message
+                            /* Remove loading message
                             res.write(`data: ${JSON.stringify({
                                 type: "remove",
                                 props: { ID: "loading-yelp" }
                             })}\n\n`);
                             if (res.flush) res.flush();
-
+                            */
+                           
                             // Continue with follow-up stream
                             const followUpMessages = [
                                 ...messageList,
