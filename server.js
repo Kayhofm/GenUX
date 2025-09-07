@@ -228,17 +228,7 @@ const generateContent = async (prompt, res) => {
 
           if (toolCallBuffer.name === 'get_yelp') {
             const businesses = await getYelpBusinesses(args.query, args.location || "Seattle, WA");
-/*
-            const productResponse = await openai.chat.completions.create({
-              model: currentModel,
-              messages: [
-                { role: "system", content: systemPrompt01 },
-                { role: "user", content: `Generate UI components from these Yelp listings to respond to the user prompt: ${JSON.stringify(businesses.results)}. The original user prompt was: ${prompt}` },
-                { role: "assistant", content: contextWindow }
-              ],
-              stream: true
-            });
-*/
+
             // Reuse session context and add tool results for continuation
             const productMessageList = [
               { role: "system", content: systemPrompt01 },

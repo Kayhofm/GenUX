@@ -74,6 +74,18 @@ export async function streamClaudeResponse({
         const mainStats = { emitted: 0 }; // Count components dispatched in main stream
         imgIDRef.current = imgIDRef.current || 1000;
 
+        // Emit a general creating message at stream start
+        const creatingMsg = { id: "creating-ui", active: true };
+        try {
+            res.write(`data: ${JSON.stringify({
+                type: "text",
+                props: { content: "Creating UI ...", ID: creatingMsg.id, columns: "6" }
+            })}\n\n`);
+            if (res.flush) res.flush();
+        } catch (e) {
+            console.warn("⚠️ Failed to write creating message:", e.message);
+        }
+
         for await (const message of stream) {
             // Handle tool use start
             if (message.type === "content_block_start" && message.content_block?.type === "tool_use") {
@@ -126,14 +138,6 @@ export async function streamClaudeResponse({
                         try {
                             const yelpResult = await getYelpBusinesses(input.query, input.location);
                             console.log("✅ Yelp results:", yelpResult.results.length, "businesses found");
-
-                            /* Remove loading message
-                            res.write(`data: ${JSON.stringify({
-                                type: "remove",
-                                props: { ID: "loading-yelp" }
-                            })}\n\n`);
-                            if (res.flush) res.flush();
-                            */
                            
                             // Continue with follow-up stream
                             const followUpMessages = [
@@ -174,7 +178,7 @@ export async function streamClaudeResponse({
                             console.log("🔁 Follow-up stream starting (Yelp results) for session:", sessionId);
                             // Process follow-up stream with stats for logging
                             const followUpStats = { emitted: 0 };
-                            await processStream(followUpStream, res, imgIDRef, followUpStats);
+                            await processStream(followUpStream, res, imgIDRef, followUpStats, creatingMsg);
                             console.log("🔁 Follow-up stream completed. Components dispatched:", followUpStats.emitted, "session:", sessionId);
 
                         } catch (toolError) {
@@ -225,7 +229,7 @@ export async function streamClaudeResponse({
                     try {
                         const parsed = JSON.parse(tempBuffer);
                         if (Array.isArray(parsed)) {
-                            processComponents(parsed, res, imgIDRef, mainStats);
+                            processComponents(parsed, res, imgIDRef, mainStats, creatingMsg);
                             buffer = ""; // Reset buffer after successful parse
                         }
                     } catch (err) {
@@ -283,7 +287,7 @@ export async function streamClaudeResponse({
 }
 
 // Helper function to process streaming responses
-async function processStream(stream, res, imgIDRef) {
+async function processStream(stream, res, imgIDRef, stats, creatingMsg) {
     let buffer = "";
     let parseWarnedFollowUp = false;
     
@@ -304,8 +308,7 @@ async function processStream(stream, res, imgIDRef) {
                 try {
                     const parsed = JSON.parse(tempBuffer);
                     if (Array.isArray(parsed)) {
-                        // stats arg is optional for backwards-compat
-                        processComponents(parsed, res, imgIDRef, arguments[3]);
+                        processComponents(parsed, res, imgIDRef, stats, creatingMsg);
                         buffer = "";
                     }
                 } catch (err) {
@@ -321,7 +324,18 @@ async function processStream(stream, res, imgIDRef) {
 }
 
 // Helper function to process UI components
-function processComponents(components, res, imgIDRef, stats) {
+function processComponents(components, res, imgIDRef, stats, creatingMsg) {
+    // On the very first component dispatch, remove the generic creating message
+    if (creatingMsg?.active) {
+        try {
+            res.write(`data: ${JSON.stringify({ type: "remove", props: { ID: creatingMsg.id } })}\n\n`);
+            if (res.flush) res.flush();
+        } catch (e) {
+            console.warn("⚠️ Failed to remove creating message:", e.message);
+        }
+        creatingMsg.active = false;
+    }
+
     components.forEach(item => {
         const needsImage = needsImageTypes.includes(item.type);
         const content = item.props?.content || "missing content";
