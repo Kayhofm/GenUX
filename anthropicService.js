@@ -4,6 +4,15 @@ import { Anthropic } from '@anthropic-ai/sdk';
 import { needsImageTypes } from './imageTypes.js';
 import { getYelpBusinesses } from './toolYelp.js';
 
+// Initialize Anthropic client once at module scope
+const anthropicClient = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+if (!process.env.ANTHROPIC_API_KEY) {
+    console.warn("⚠️ ANTHROPIC_API_KEY is not set. Claude calls will fail.");
+}
+
 // Define Yelp tool for Claude
 const yelpTool = {
     name: "get_yelp_businesses",
@@ -36,10 +45,6 @@ export async function streamClaudeResponse({
     sessionMessages,
     imgIDRef,
 }) {
-    const anthropic = new Anthropic({
-        apiKey: process.env.ANTHROPIC_API_KEY,
-    });
-
     try {
         console.log("🟣 Claude block triggered");
 
@@ -50,7 +55,7 @@ export async function streamClaudeResponse({
         // console.log("🛠️ Available tools:", JSON.stringify([yelpTool], null, 2));
 
         // Start with streaming immediately
-        const stream = await anthropic.messages.stream({
+        const stream = await anthropicClient.messages.stream({
             model,
             max_tokens: 2048,
             system: systemPrompt,
@@ -159,7 +164,7 @@ export async function streamClaudeResponse({
                             ];
 
                             // Start new stream for results
-                            const followUpStream = await anthropic.messages.stream({
+                            const followUpStream = await anthropicClient.messages.stream({
                                 model,
                                 max_tokens: 2048,
                                 system: systemPrompt,
