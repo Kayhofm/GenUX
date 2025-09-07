@@ -1,15 +1,12 @@
 import API_CONFIG from '../config/api';
 
 export async function streamOpenAIContent(prompt, onData, bypassKey = null, options = {}) {
-  // ✅ Use backticks for template literal
   let API_URL = `${API_CONFIG.BASE_URL}/api/generate?prompt=${encodeURIComponent(prompt)}`;
 
-  // ✅ Also wrap this string in backticks and fix &
   if (bypassKey) {
     API_URL += `&bypass=${encodeURIComponent(bypassKey)}`;
   }
 
-  // Removed HEAD pre-check to save an extra round trip.
   // Any rate limits or server errors will be surfaced via the SSE connection.
 
   const {

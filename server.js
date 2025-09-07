@@ -224,6 +224,7 @@ const generateContent = async (prompt, res) => {
               columns: "6"
             }
           })}\n\n`);
+          if (res.flush) res.flush();
 
           if (toolCallBuffer.name === 'get_yelp') {
             const businesses = await getYelpBusinesses(args.query, args.location || "Seattle, WA");
@@ -261,6 +262,7 @@ const generateContent = async (prompt, res) => {
                 ID: "9999",
               }
             })}\n\n`);
+            if (res.flush) res.flush();
 
             for await (const chunk of productResponse) {
               const content = chunk.choices[0]?.delta?.content;
@@ -313,6 +315,7 @@ const generateContent = async (prompt, res) => {
                         }
                         console.log("Sending function component:\n", item);
                         res.write(`data: ${JSON.stringify(item)}\n\n`);
+                        if (res.flush) res.flush();
                       });
                       productBuffer = "";
                     }
@@ -389,6 +392,7 @@ const generateContent = async (prompt, res) => {
 
                 console.log("Sending component:\n", item);
                 res.write(`data: ${JSON.stringify(item)}\n\n`);
+                if (res.flush) res.flush();
               });
 
               buffer = ""; // Clear buffer after sending all components

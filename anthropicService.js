@@ -88,6 +88,7 @@ export async function streamClaudeResponse({
                         columns: "6"
                     }
                 })}\n\n`);
+                if (res.flush) res.flush();
 
                 pendingToolUse = {
                     id: message.content_block.id,
@@ -184,6 +185,7 @@ export async function streamClaudeResponse({
                                 type: "remove", 
                                 props: { ID: "loading-yelp" }
                             })}\n\n`);
+                            if (res.flush) res.flush();
 
                             res.write(`data: ${JSON.stringify({
                                 type: "text",
@@ -193,6 +195,7 @@ export async function streamClaudeResponse({
                                     columns: "6"
                                 }
                             })}\n\n`);
+                            if (res.flush) res.flush();
                         }
                     }
                 } catch (parseError) {
@@ -242,6 +245,7 @@ export async function streamClaudeResponse({
 
         console.log("📤 Sending [DONE]. Session:", sessionId, "components:", mainStats.emitted, "tool_used:", sawToolUse);
         res.write("data: [DONE]\n\n");
+        if (res.flush) res.flush();
         res.end();
 
         // Log interaction
@@ -267,6 +271,7 @@ export async function streamClaudeResponse({
                 // Explicit log for overload path to aid diagnosis
                 console.warn("🟥 Sending overload SSE error to client (Claude overloaded). Session:", sessionId);
                 res.write(`data: ${JSON.stringify({ type: "error", message: "Claude overloaded" })}\n\n`);
+                if (res.flush) res.flush();
                 res.end();
             } catch (writeErr) {
                 console.warn("⚠️ Tried to write error to closed response:", writeErr.message);
@@ -341,5 +346,6 @@ function processComponents(components, res, imgIDRef, stats) {
 
         console.log("🧩 Dispatching component:", item.type, item.props?.ID || "no-id");
         res.write(`data: ${JSON.stringify(item)}\n\n`);
+        if (res.flush) res.flush();
     });
 }
