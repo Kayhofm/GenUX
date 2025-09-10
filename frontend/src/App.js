@@ -99,7 +99,7 @@ function App() {
                 marginLeft: '20px', 
                 backgroundColor: currentTheme.palette.background.default 
               }}>
-              <React.Suspense fallback={<div>Loading UI...</div>}>
+              <React.Suspense fallback={<div>Creating UI...</div>}>
                 <UISection content={content} onContentGenerated={handleContentGenerated} />
               </React.Suspense>
             </section>
