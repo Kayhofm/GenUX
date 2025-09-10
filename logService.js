@@ -46,13 +46,10 @@ function rotateIfNeeded() {
   }
 }
 
-export function logInteraction({ type, prompt, result, ip, model, id }) {
-  rotateIfNeeded();
+export async function logInteraction({ type, prompt, result, ip, model, id }) {
+  const useKV = process.env.VERCEL === '1' || process.env.USE_KV === '1';
   const logEntry = {
-    timestamp: new Date().toLocaleString("en-US", { 
-      timeZone: "America/Los_Angeles", 
-      timeZoneName: "short" 
-    }),
+    timestamp: new Date().toISOString(),
     type,
     prompt,
     result,
@@ -61,6 +58,27 @@ export function logInteraction({ type, prompt, result, ip, model, id }) {
     id
   };
 
-  const logLine = JSON.stringify(logEntry) + '\n';
-  fs.appendFileSync(logFilePath, logLine);
+  if (useKV) {
+    try {
+      const { kv } = await import('@vercel/kv');
+      // Newest first list, capped
+      await kv.lpush('logs', JSON.stringify(logEntry));
+      await kv.ltrim('logs', 0, 49999); // keep last 50k
+      return;
+    } catch (e) {
+      console.warn('KV logging failed, falling back to file:', e.message);
+      // fall back to file
+    }
+  }
+
+  // File-based logging (local/dev)
+  rotateIfNeeded();
+  try {
+    const logLine = JSON.stringify(logEntry) + '\n';
+    fs.appendFileSync(logFilePath, logLine);
+  } catch (e) {
+    console.warn('File logging failed:', e.message);
+  }
 }
+
+export { logFilePath };

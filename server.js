@@ -612,43 +612,77 @@ async function tailLines(filePath, maxLines, chunkSize = 64 * 1024) {
 app.get("/logs", async (req, res) => {
   const page = Math.max(parseInt(req.query.page || '1', 10), 1);
   const pageSize = Math.min(Math.max(parseInt(req.query.pageSize || '300', 10), 50), 1000);
-  const needed = page * pageSize;
+  const useKV = process.env.VERCEL === '1' || process.env.USE_KV === '1';
 
-  const tailed = await tailLines(logFilePath, needed);
-  const totalFetched = tailed.length;
-  const start = Math.min((page - 1) * pageSize, totalFetched);
-  const end = Math.min(start + pageSize, totalFetched);
-  const pageLines = tailed.slice(start, end);
+  let entries = '';
+  let newer = null;
+  let older = null;
 
-  const entries = pageLines.map((line, index) => {
+  if (useKV) {
     try {
-      const entry = JSON.parse(line);
-      let resultFormatted;
-      try {
-        resultFormatted = JSON.stringify(JSON.parse(entry.result), null, 2);
-      } catch {
-        resultFormatted = entry.result || "(No result)";
-      }
-      return `
-        <div class="entry">
-          <p><strong>${new Date(entry.timestamp).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}</strong> | <code>${entry.type}</code> | <code>${entry.model}</code> | IP: ${entry.ip}</p>
-          <p><strong>${entry.type === "comment" ? "Comment" : "Prompt"}:</strong> ${entry.prompt}</p>
-          ${entry.type !== "comment" ? `
-            <details>
-              <summary><strong>Result (click to expand)</strong></summary>
-              <pre>${resultFormatted}</pre>
-            </details>
-          ` : ""}
-        </div>
-        <hr />
-      `;
+      const { kv } = await import('@vercel/kv');
+      const startIdx = (page - 1) * pageSize;
+      const endIdx = startIdx + pageSize - 1;
+      const items = await kv.lrange('logs', startIdx, endIdx);
+      newer = page > 1 ? page - 1 : null;
+      older = items.length === pageSize ? page + 1 : null;
+      entries = items.map((line, index) => {
+        try {
+          const entry = JSON.parse(line);
+          let resultFormatted;
+          try { resultFormatted = JSON.stringify(JSON.parse(entry.result), null, 2); } catch { resultFormatted = entry.result || "(No result)"; }
+          return `
+            <div class="entry">
+              <p><strong>${new Date(entry.timestamp).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}</strong> | <code>${entry.type}</code> | <code>${entry.model}</code> | IP: ${entry.ip}</p>
+              <p><strong>${entry.type === "comment" ? "Comment" : "Prompt"}:</strong> ${entry.prompt}</p>
+              ${entry.type !== "comment" ? `
+                <details>
+                  <summary><strong>Result (click to expand)</strong></summary>
+                  <pre>${resultFormatted}</pre>
+                </details>
+              ` : ""}
+            </div>
+            <hr />
+          `;
+        } catch {
+          return `<p>Error parsing entry ${index + 1}</p>`;
+        }
+      }).join('\n');
     } catch (e) {
-      return `<p>Error parsing line ${index + 1}</p>`;
+      entries = `<p>KV unavailable: ${e.message}</p>`;
     }
-  }).join('\n');
-
-  const newer = page > 1 ? page - 1 : null;
-  const older = totalFetched >= needed ? page + 1 : null;
+  } else {
+    const needed = page * pageSize;
+    const tailed = await tailLines(logFilePath, needed);
+    const totalFetched = tailed.length;
+    const start = Math.min((page - 1) * pageSize, totalFetched);
+    const end = Math.min(start + pageSize, totalFetched);
+    const pageLines = tailed.slice(start, end);
+    entries = pageLines.map((line, index) => {
+      try {
+        const entry = JSON.parse(line);
+        let resultFormatted;
+        try { resultFormatted = JSON.stringify(JSON.parse(entry.result), null, 2); } catch { resultFormatted = entry.result || "(No result)"; }
+        return `
+          <div class="entry">
+            <p><strong>${new Date(entry.timestamp).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}</strong> | <code>${entry.type}</code> | <code>${entry.model}</code> | IP: ${entry.ip}</p>
+            <p><strong>${entry.type === "comment" ? "Comment" : "Prompt"}:</strong> ${entry.prompt}</p>
+            ${entry.type !== "comment" ? `
+              <details>
+                <summary><strong>Result (click to expand)</strong></summary>
+                <pre>${resultFormatted}</pre>
+              </details>
+            ` : ""}
+          </div>
+          <hr />
+        `;
+      } catch (e) {
+        return `<p>Error parsing line ${index + 1}</p>`;
+      }
+    }).join('\n');
+    newer = page > 1 ? page - 1 : null;
+    older = totalFetched >= needed ? page + 1 : null;
+  }
   const pager = `
     <div class="pager">
       ${newer ? `<a href=\"/logs?page=${newer}&pageSize=${pageSize}\">Newer</a>` : ''}
