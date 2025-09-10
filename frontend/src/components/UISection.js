@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import DynamicRenderer from "./DynamicRenderer";
-import { Box } from '@mui/material';
+import { Box, Fade } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import API_CONFIG from '../config/api';
 
@@ -50,21 +50,28 @@ function UISection({ content, onContentGenerated, ...props }) {
     >
       {content
         .filter(component => component && component.type && component.props) // ignore theme-only messages
-        .map((component, index) => (
-          <DynamicRenderer
-            key={index}
-            component={{
-              ...component,
-              props: {
-                ...component.props,
-                imageSrc: component.props.imageID 
-                  ? (imageMap[component.props.imageID] || component.props.imageSrc || "/img/default-image.png")
-                  : (component.props.imageSrc || "/img/default-image.png"),
-              },
-            }}
-            onContentGenerated={onContentGenerated}
-          />
-      ))}
+        .map((component, index) => {
+          const key = component.props?.ID ?? index;
+          const delayMs = Math.min(index * 40, 320); // subtle stagger
+          return (
+            <Fade in timeout={220} style={{ transitionDelay: `${delayMs}ms` }} key={key}>
+              <div>
+                <DynamicRenderer
+                  component={{
+                    ...component,
+                    props: {
+                      ...component.props,
+                      imageSrc: component.props.imageID 
+                        ? (imageMap[component.props.imageID] || component.props.imageSrc || "/img/default-image.png")
+                        : (component.props.imageSrc || "/img/default-image.png"),
+                    },
+                  }}
+                  onContentGenerated={onContentGenerated}
+                />
+              </div>
+            </Fade>
+          );
+        })}
     </Box>
   );
 }
