@@ -49,7 +49,6 @@ function rotateIfNeeded() {
 
 export async function logInteraction({ type, prompt, result, ip, model, id }) {
   const useRedis = !!process.env.REDIS_URL || process.env.USE_REDIS === '1';
-  const useKV = !useRedis && (process.env.VERCEL === '1' || process.env.USE_KV === '1');
   const logEntry = {
     timestamp: new Date().toISOString(),
     type,
@@ -80,18 +79,7 @@ export async function logInteraction({ type, prompt, result, ip, model, id }) {
     }
   }
 
-  if (useKV) {
-    try {
-      const { kv } = await import('@vercel/kv');
-      // Newest first list, capped
-      await kv.lpush('logs', JSON.stringify(logEntry));
-      await kv.ltrim('logs', 0, 49999); // keep last 50k
-      return;
-    } catch (e) {
-      console.warn('KV logging failed, falling back to file:', e.message);
-      // fall back to file
-    }
-  }
+  // No KV path; if Redis is not enabled/available, fall back to file
 
   // File-based logging (local/dev)
   rotateIfNeeded();
