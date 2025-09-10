@@ -574,79 +574,105 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('PORT environment variable:', process.env.PORT);
 });
 
-// Logging webpage – only available in local development
-  app.get("/logs", (req, res) => {
-    const content = fs.readFileSync(logFilePath, "utf8");
-    const lines = content.trim().split('\n');
-
-    const entries = lines.reverse().map((line, index) => {
-      try {
-        const entry = JSON.parse(line);
-        let resultFormatted;
-        try {
-          resultFormatted = JSON.stringify(JSON.parse(entry.result), null, 2);
-        } catch {
-          resultFormatted = entry.result || "(No result)";
+// Helper to read the last N lines efficiently
+async function tailLines(filePath, maxLines, chunkSize = 64 * 1024) {
+  try {
+    const fh = await fs.promises.open(filePath, 'r');
+    try {
+      const stat = await fh.stat();
+      let pos = stat.size;
+      let lines = [];
+      let leftover = '';
+      while (pos > 0 && lines.length <= maxLines) {
+        const readSize = Math.min(chunkSize, pos);
+        pos -= readSize;
+        const { bytesRead, buffer } = await fh.read({ buffer: Buffer.alloc(readSize), position: pos });
+        const chunk = buffer.slice(0, bytesRead).toString('utf8');
+        const combined = chunk + leftover;
+        const parts = combined.split('\n');
+        leftover = parts.shift();
+        for (let i = parts.length - 1; i >= 0 && lines.length < maxLines; i--) {
+          const line = parts[i];
+          if (line.trim().length) lines.push(line);
         }
-        return `
-          <div class="entry">
-            <p><strong>${new Date(entry.timestamp).toLocaleString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-              hour: 'numeric',
-              minute: '2-digit',
-              hour12: true
-            })}</strong> | <code>${entry.type}</code> | <code>${entry.model}</code> | IP: ${entry.ip}</p>
-            <p><strong>${entry.type === "comment" ? "Comment" : "Prompt"}:</strong> ${entry.prompt}</p>
-            ${entry.type !== "comment" ? `
-              <details>
-                <summary><strong>Result (click to expand)</strong></summary>
-                <pre>${resultFormatted}</pre>
-              </details>
-            ` : ""}
-          </div>
-          <hr />
-        `;
-      } catch (e) {
-        return `<p>Error parsing line ${index + 1}</p>`;
       }
-    }).join('\n');
+      if (lines.length < maxLines && leftover.trim().length) lines.push(leftover);
+      await fh.close();
+      return lines; // newest-first
+    } catch (e) {
+      await fh.close();
+      throw e;
+    }
+  } catch {
+    return [];
+  }
+}
 
-    res.send(`
-      <html>
-        <head>
-          <title>Interaction Logs</title>
-          <style>
-            body {
-              font-family: sans-serif;
-              padding: 20px;
-              background: #f9f9f9;
-            }
-            .entry {
-              margin-bottom: 24px;
-            }
-            pre {
-              background: #eee;
-              padding: 10px;
-              border-radius: 6px;
-              overflow-x: auto;
-            }
-            summary {
-              cursor: pointer;
-              font-weight: bold;
-            }
-            code {
-              background: #e1e1e1;
-              padding: 2px 4px;
-              border-radius: 3px;
-            }
-          </style>
-        </head>
-        <body>
-          <h1>Interaction Logs</h1>
-          ${entries}
-        </body>
-      </html>
-    `);
-  });
+// Async, paginated log viewer (newest first)
+app.get("/logs", async (req, res) => {
+  const page = Math.max(parseInt(req.query.page || '1', 10), 1);
+  const pageSize = Math.min(Math.max(parseInt(req.query.pageSize || '300', 10), 50), 1000);
+  const needed = page * pageSize;
+
+  const tailed = await tailLines(logFilePath, needed);
+  const totalFetched = tailed.length;
+  const start = Math.min((page - 1) * pageSize, totalFetched);
+  const end = Math.min(start + pageSize, totalFetched);
+  const pageLines = tailed.slice(start, end);
+
+  const entries = pageLines.map((line, index) => {
+    try {
+      const entry = JSON.parse(line);
+      let resultFormatted;
+      try {
+        resultFormatted = JSON.stringify(JSON.parse(entry.result), null, 2);
+      } catch {
+        resultFormatted = entry.result || "(No result)";
+      }
+      return `
+        <div class="entry">
+          <p><strong>${new Date(entry.timestamp).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}</strong> | <code>${entry.type}</code> | <code>${entry.model}</code> | IP: ${entry.ip}</p>
+          <p><strong>${entry.type === "comment" ? "Comment" : "Prompt"}:</strong> ${entry.prompt}</p>
+          ${entry.type !== "comment" ? `
+            <details>
+              <summary><strong>Result (click to expand)</strong></summary>
+              <pre>${resultFormatted}</pre>
+            </details>
+          ` : ""}
+        </div>
+        <hr />
+      `;
+    } catch (e) {
+      return `<p>Error parsing line ${index + 1}</p>`;
+    }
+  }).join('\n');
+
+  const newer = page > 1 ? page - 1 : null;
+  const older = totalFetched >= needed ? page + 1 : null;
+  const pager = `
+    <div class="pager">
+      ${newer ? `<a href=\"/logs?page=${newer}&pageSize=${pageSize}\">Newer</a>` : ''}
+      ${older ? `<a href=\"/logs?page=${older}&pageSize=${pageSize}\">Older</a>` : ''}
+    </div>`;
+
+  res.send(`
+    <html>
+      <head>
+        <title>Interaction Logs</title>
+        <style>
+          body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
+          .entry { margin-bottom: 24px; }
+          pre { background: #eee; padding: 10px; border-radius: 6px; overflow-x: auto; }
+          summary { cursor: pointer; font-weight: bold; }
+          code { background: #e1e1e1; padding: 2px 4px; border-radius: 3px; }
+          .pager a { margin-right: 12px; }
+        </style>
+      </head>
+      <body>
+        <h1>Interaction Logs</h1>
+        ${pager}
+        ${entries}
+      </body>
+    </html>
+  `);
+});

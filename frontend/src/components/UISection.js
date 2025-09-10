@@ -52,7 +52,7 @@ function UISection({ content, onContentGenerated, ...props }) {
         .filter(component => component && component.type && component.props) // ignore theme-only messages
         .map((component, index) => {
           const key = component.props?.ID ?? index;
-          const delayMs = Math.min(index * 40, 320); // subtle stagger
+          const delayMs = Math.min(index * 40, 320); // subtle stagger between components
           return (
             <Fade in timeout={220} style={{ transitionDelay: `${delayMs}ms` }} key={key}>
               <div>
