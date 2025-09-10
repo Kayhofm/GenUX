@@ -99,7 +99,11 @@ function App() {
                 marginLeft: '20px', 
                 backgroundColor: currentTheme.palette.background.default 
               }}>
-              <React.Suspense fallback={<Typography variant="body1" sx={{ m: '4px 10px', textAlign: 'left' }}>Creating UI...</Typography>}>
+              <React.Suspense fallback={
+                <Typography variant="body1" sx={{ m: '4px 10px', textAlign: 'left' }}>
+                  Creating UI...
+                </Typography>
+              }>
                 <UISection content={content} onContentGenerated={handleContentGenerated} />
               </React.Suspense>
             </section>
