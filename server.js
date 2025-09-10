@@ -12,6 +12,7 @@ import fs from 'fs';
 import rateLimit from 'express-rate-limit';
 import nodemailer from 'nodemailer';
 import { logInteraction } from './logService.js';
+import { createClient as createRedisClient } from 'redis';
 import { streamClaudeResponse } from './anthropicService.js';
 
 // Fixed JSON imports - read files instead of using import with syntax
@@ -612,13 +613,52 @@ async function tailLines(filePath, maxLines, chunkSize = 64 * 1024) {
 app.get("/logs", async (req, res) => {
   const page = Math.max(parseInt(req.query.page || '1', 10), 1);
   const pageSize = Math.min(Math.max(parseInt(req.query.pageSize || '300', 10), 50), 1000);
-  const useKV = process.env.VERCEL === '1' || process.env.USE_KV === '1';
+  const useRedis = !!process.env.REDIS_URL || process.env.USE_REDIS === '1';
+  const useKV = !useRedis && (process.env.VERCEL === '1' || process.env.USE_KV === '1');
 
   let entries = '';
   let newer = null;
   let older = null;
 
-  if (useKV) {
+  if (useRedis) {
+    try {
+      if (!globalThis.__redisClient) {
+        const client = createRedisClient({ url: process.env.REDIS_URL });
+        client.on('error', (err) => console.warn('Redis error:', err?.message));
+        await client.connect();
+        globalThis.__redisClient = client;
+      }
+      const startIdx = (page - 1) * pageSize;
+      const endIdx = startIdx + pageSize - 1;
+      const items = await globalThis.__redisClient.lRange('logs', startIdx, endIdx);
+      newer = page > 1 ? page - 1 : null;
+      older = items.length === pageSize ? page + 1 : null;
+      entries = items.map((line, index) => {
+        try {
+          const entry = JSON.parse(line);
+          let resultFormatted;
+          try { resultFormatted = JSON.stringify(JSON.parse(entry.result), null, 2); } catch { resultFormatted = entry.result || "(No result)"; }
+          return `
+            <div class="entry">
+              <p><strong>${new Date(entry.timestamp).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}</strong> | <code>${entry.type}</code> | <code>${entry.model}</code> | IP: ${entry.ip}</p>
+              <p><strong>${entry.type === "comment" ? "Comment" : "Prompt"}:</strong> ${entry.prompt}</p>
+              ${entry.type !== "comment" ? `
+                <details>
+                  <summary><strong>Result (click to expand)</strong></summary>
+                  <pre>${resultFormatted}</pre>
+                </details>
+              ` : ""}
+            </div>
+            <hr />
+          `;
+        } catch {
+          return `<p>Error parsing entry ${index + 1}</p>`;
+        }
+      }).join('\n');
+    } catch (e) {
+      entries = `<p>Redis unavailable: ${e.message}</p>`;
+    }
+  } else if (useKV) {
     try {
       const { kv } = await import('@vercel/kv');
       const startIdx = (page - 1) * pageSize;

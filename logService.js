@@ -1,6 +1,7 @@
 // logService.js
 import fs from 'fs';
 import path from 'path';
+import { createClient as createRedisClient } from 'redis';
 
 const logFilePath = './logs/interaction_logs.txt';
 fs.mkdirSync('./logs', { recursive: true }); // ensure the folder exists
@@ -47,7 +48,8 @@ function rotateIfNeeded() {
 }
 
 export async function logInteraction({ type, prompt, result, ip, model, id }) {
-  const useKV = process.env.VERCEL === '1' || process.env.USE_KV === '1';
+  const useRedis = !!process.env.REDIS_URL || process.env.USE_REDIS === '1';
+  const useKV = !useRedis && (process.env.VERCEL === '1' || process.env.USE_KV === '1');
   const logEntry = {
     timestamp: new Date().toISOString(),
     type,
@@ -57,6 +59,26 @@ export async function logInteraction({ type, prompt, result, ip, model, id }) {
     ip,
     id
   };
+
+  // Redis (TCP) logging if configured
+  if (useRedis) {
+    try {
+      if (!globalThis.__redisClient) {
+        const url = process.env.REDIS_URL;
+        const client = createRedisClient({ url });
+        client.on('error', (err) => console.warn('Redis error:', err?.message));
+        await client.connect();
+        globalThis.__redisClient = client;
+      }
+      const r = globalThis.__redisClient;
+      await r.lPush('logs', JSON.stringify(logEntry));
+      await r.lTrim('logs', 0, 49999);
+      return;
+    } catch (e) {
+      console.warn('Redis logging failed, falling back:', e.message);
+      // fall through to KV or file
+    }
+  }
 
   if (useKV) {
     try {
