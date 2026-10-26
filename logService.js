@@ -47,6 +47,42 @@ function rotateIfNeeded() {
   }
 }
 
+const REDIS_RETRY_COOLDOWN_MS = 60 * 1000;
+let redisRetryAfter = 0;
+let redisConnecting = null;
+
+// Shared Redis client. Gives up quickly when Redis is unreachable (instead of
+// retrying forever) and returns null, so callers can fall back to file logs.
+export async function getRedisClient() {
+  if (globalThis.__redisClient?.isReady) return globalThis.__redisClient;
+  if (Date.now() < redisRetryAfter) return null;
+  if (redisConnecting) return redisConnecting;
+
+  redisConnecting = (async () => {
+    const client = createRedisClient({
+      url: process.env.REDIS_URL,
+      socket: {
+        connectTimeout: 5000,
+        reconnectStrategy: (retries) => (retries >= 3 ? new Error('Redis unreachable') : 500),
+      },
+    });
+    client.on('error', () => {}); // failures are handled via connect()/commands below
+    try {
+      await client.connect();
+      globalThis.__redisClient = client;
+      return client;
+    } catch (e) {
+      console.warn(`Redis unavailable (${e.message}); using file logs for ${REDIS_RETRY_COOLDOWN_MS / 1000}s`);
+      redisRetryAfter = Date.now() + REDIS_RETRY_COOLDOWN_MS;
+      client.disconnect().catch(() => {});
+      return null;
+    } finally {
+      redisConnecting = null;
+    }
+  })();
+  return redisConnecting;
+}
+
 export async function logInteraction({ type, prompt, result, ip, model, id }) {
   const useRedis = !!process.env.REDIS_URL || process.env.USE_REDIS === '1';
   const logEntry = {
@@ -59,23 +95,18 @@ export async function logInteraction({ type, prompt, result, ip, model, id }) {
     id
   };
 
-  // Redis (TCP) logging if configured
+  // Redis (TCP) logging if configured; falls back to file if unreachable
   if (useRedis) {
     try {
-      if (!globalThis.__redisClient) {
-        const url = process.env.REDIS_URL;
-        const client = createRedisClient({ url });
-        client.on('error', (err) => console.warn('Redis error:', err?.message));
-        await client.connect();
-        globalThis.__redisClient = client;
+      const r = await getRedisClient();
+      if (r) {
+        await r.lPush('logs', JSON.stringify(logEntry));
+        await r.lTrim('logs', 0, 49999);
+        return;
       }
-      const r = globalThis.__redisClient;
-      await r.lPush('logs', JSON.stringify(logEntry));
-      await r.lTrim('logs', 0, 49999);
-      return;
     } catch (e) {
       console.warn('Redis logging failed, falling back:', e.message);
-      // fall through to KV or file
+      // fall through to file
     }
   }
 

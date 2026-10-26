@@ -11,8 +11,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import fs from 'fs';
 import rateLimit from 'express-rate-limit';
 import nodemailer from 'nodemailer';
-import { logInteraction } from './logService.js';
-import { createClient as createRedisClient } from 'redis';
+import { logInteraction, getRedisClient } from './logService.js';
 import { streamClaudeResponse } from './anthropicService.js';
 
 // Fixed JSON imports - read files instead of using import with syntax
@@ -621,15 +620,11 @@ app.get("/logs", async (req, res) => {
 
   if (useRedis) {
     try {
-      if (!globalThis.__redisClient) {
-        const client = createRedisClient({ url: process.env.REDIS_URL });
-        client.on('error', (err) => console.warn('Redis error:', err?.message));
-        await client.connect();
-        globalThis.__redisClient = client;
-      }
+      const redis = await getRedisClient();
+      if (!redis) throw new Error('Redis unreachable');
       const startIdx = (page - 1) * pageSize;
       const endIdx = startIdx + pageSize - 1;
-      const items = await globalThis.__redisClient.lRange('logs', startIdx, endIdx);
+      const items = await redis.lRange('logs', startIdx, endIdx);
       newer = page > 1 ? page - 1 : null;
       older = items.length === pageSize ? page + 1 : null;
       entries = items.map((line, index) => {
