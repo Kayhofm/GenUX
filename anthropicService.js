@@ -57,7 +57,8 @@ export async function streamClaudeResponse({
         // Start with streaming immediately
         const stream = await anthropicClient.messages.stream({
             model,
-            max_tokens: 2048,
+            max_tokens: 16000,
+            thinking: { type: "disabled" }, // Haiku 5.5 thinks by default and would spend the budget before any JSON
             system: systemPrompt,
             messages: messageList,
             tools: [yelpTool],
@@ -178,7 +179,8 @@ export async function streamClaudeResponse({
                             // Start new stream for results
                             const followUpStream = await anthropicClient.messages.stream({
                                 model,
-                                max_tokens: 2048,
+                                max_tokens: 16000,
+                                thinking: { type: "disabled" }, // Haiku 5.5 thinks by default and would spend the budget before any JSON
                                 system: systemPrompt,
                                 messages: followUpMessages,
                             });
