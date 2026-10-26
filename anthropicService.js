@@ -220,15 +220,11 @@ export async function streamClaudeResponse({
                     fullMessage += delta;
 
                     // Process streaming JSON as it comes in
-                    let tempBuffer = buffer;
-                    if (tempBuffer.startsWith("[")) tempBuffer = tempBuffer.slice(1);
-                    if (tempBuffer.endsWith("]")) tempBuffer = tempBuffer.slice(0, -1);
-                    if (tempBuffer.endsWith(",")) tempBuffer = tempBuffer.slice(0, -1);
-                    tempBuffer = `[${tempBuffer}]`;
+                    const tempBuffer = toParsableArray(buffer);
 
                     try {
                         const parsed = JSON.parse(tempBuffer);
-                        if (Array.isArray(parsed)) {
+                        if (Array.isArray(parsed) && parsed.length > 0) {
                             processComponents(parsed, res, imgIDRef, mainStats, creatingMsg);
                             buffer = ""; // Reset buffer after successful parse
                         }
@@ -286,6 +282,18 @@ export async function streamClaudeResponse({
     }
 }
 
+// Turn the streamed text so far into a JSON array string. Tolerates a leading "[",
+// leading/trailing commas (models may start a chunk with the separator), whitespace
+// and markdown code fences around the output.
+export function toParsableArray(buffer) {
+    let t = buffer.trim().replace(/^```(?:json)?\s*/i, "").replace(/```$/, "").trim();
+    if (t.startsWith("[")) t = t.slice(1).trim();
+    while (t.startsWith(",")) t = t.slice(1).trim();
+    if (t.endsWith("]")) t = t.slice(0, -1).trim();
+    if (t.endsWith(",")) t = t.slice(0, -1).trim();
+    return `[${t}]`;
+}
+
 // Helper function to process streaming responses
 async function processStream(stream, res, imgIDRef, stats, creatingMsg) {
     let buffer = "";
@@ -299,15 +307,11 @@ async function processStream(stream, res, imgIDRef, stats, creatingMsg) {
                 buffer += delta;
                 
                 // Try to parse and send complete JSON objects
-                let tempBuffer = buffer;
-                if (tempBuffer.startsWith("[")) tempBuffer = tempBuffer.slice(1);
-                if (tempBuffer.endsWith("]")) tempBuffer = tempBuffer.slice(0, -1);
-                if (tempBuffer.endsWith(",")) tempBuffer = tempBuffer.slice(0, -1);
-                tempBuffer = `[${tempBuffer}]`;
+                const tempBuffer = toParsableArray(buffer);
 
                 try {
                     const parsed = JSON.parse(tempBuffer);
-                    if (Array.isArray(parsed)) {
+                    if (Array.isArray(parsed) && parsed.length > 0) {
                         processComponents(parsed, res, imgIDRef, stats, creatingMsg);
                         buffer = "";
                     }
