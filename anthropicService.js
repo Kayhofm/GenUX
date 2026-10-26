@@ -86,7 +86,14 @@ export async function streamClaudeResponse({
             console.warn("⚠️ Failed to write creating message:", e.message);
         }
 
+        const eventCounts = {}; // Diagnostics: stream event/block types seen
+        let stopReason = null;
+
         for await (const message of stream) {
+            const kind = message.type === "content_block_start" ? `start:${message.content_block?.type}` : message.type;
+            eventCounts[kind] = (eventCounts[kind] || 0) + 1;
+            if (message.type === "message_delta" && message.delta?.stop_reason) stopReason = message.delta.stop_reason;
+
             // Handle tool use start
             if (message.type === "content_block_start" && message.content_block?.type === "tool_use") {
                 sawToolUse = true;
@@ -243,6 +250,7 @@ export async function streamClaudeResponse({
             console.log("ℹ️ No tool_use observed; main stream completed. Session:", sessionId, "components:", mainStats.emitted);
         }
 
+        console.log("🔎 Stream summary:", JSON.stringify({ stopReason, events: eventCounts, textChars: fullMessage.length, head: fullMessage.slice(0, 300), tail: fullMessage.slice(-200) }));
         console.log("📤 Sending [DONE]. Session:", sessionId, "components:", mainStats.emitted, "tool_used:", sawToolUse);
         res.write("data: [DONE]\n\n");
         if (res.flush) res.flush();
