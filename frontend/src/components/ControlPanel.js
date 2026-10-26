@@ -5,7 +5,7 @@ import API_CONFIG from '../config/api';
 function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [model, setModel] = useState("claude-3-5-haiku-20241022");
+  const [model, setModel] = useState("claude-haiku-5-5");
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const [bypassKey, setBypassKey] = useState('');
@@ -195,7 +195,7 @@ function ControlPanel({ onContentGenerated, prompt, setPrompt }) {
       <div style={{ marginTop: '20px', textAlign: 'left' }}>
         <label htmlFor="model-dropdown" style={{ marginRight: '8px' }}>Model</label>
         <select id="model-dropdown" value={model} onChange={handleModelChange} style={{ padding: '6px 12px' }}>
-          <option value="claude-3-5-haiku-20241022">Claude Haiku 3.5 (balanced)</option>
+          <option value="claude-haiku-5-5">Claude Haiku 5.5 (fast)</option>
           <option value="gpt-4o-mini">gpt-4o-mini (fastest)</option>
           <option value="gpt-4o">gpt-4o</option>
           <option value="gpt-5-mini">gpt-5-mini</option>

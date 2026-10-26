@@ -75,7 +75,7 @@ if(!sessionMessages[999]) sessionMessages[999] = 0;
 let imgID = 1000;
 
 // Global variable for model
-let currentModel = "claude-3-5-haiku-20241022";
+let currentModel = "claude-haiku-5-5";
 
 // Set model route
 app.post("/api/set-model", (req, res) => {
